@@ -44,7 +44,7 @@ module.exports = (client) => {
   });
 
   io.on("connection", function (socket) {
-    log("connected socket!");
+    log("connected socket:" + socket.handshake.address);
 
     const fs = require("fs");
     const path = require("path");
@@ -121,7 +121,6 @@ module.exports = (client) => {
             }
             if (!multiple) {
               send(file, function (data) {
-                console.log(data.numer);
                 if (data.number.startsWith("n")) {
                   socket.emit("struktura", data);
                 }
@@ -150,6 +149,9 @@ module.exports = (client) => {
           const element = data.rodzaj[i - 1];
 
           if (element) {
+
+            
+
             files(async function (file) {
               const content = await readFile(struktury_dir + file, "utf8");
               const json = JSON.parse(content);
@@ -184,12 +186,13 @@ module.exports = (client) => {
       logged = false;
 
       socket.on("login", function (data) {
+        log("Try login in: " + socket.handshake.address);
         if (data == "ambony11") {
           logged = true;
           const files = fs.readdirSync(polowania_dir);
 
           socket.emit("Authenticated", files);
-          console.log("Logged on: " + socket.handshake.address);
+          log("Logged on: " + socket.handshake.address);
         }
       });
 
@@ -223,46 +226,40 @@ module.exports = (client) => {
           encoding: "base64",
         });
 
+        //log(socket.handshake.address + "created: " + )
+
         let numer = " " + data.numer;
         if (data.numer == "") numer = "Bez numeru";
 
         setTimeout(() => {
-          
           if (data.rodzaj == "1") {
             console.log(numer);
             client.channels.cache
               .get(`999685658572496906`)
-              .send(`🔢Nr.${numer}`)
-            client.channels.cache
-              .get(`999685658572496906`)
-              .send({
-                files: [`${struktury_dir}${nazwa}.jpg`],
-              });
+              .send(`🔢Nr.${numer}`);
+            client.channels.cache.get(`999685658572496906`).send({
+              files: [`${struktury_dir}${nazwa}.jpg`],
+            });
           }
-  
+
           if (data.rodzaj == "2") {
             client.channels.cache
               .get(`999685864919683122`)
-              .send(`🔢Nr.${numer}`)
-            client.channels.cache
-              .get(`999685864919683122`)
-              .send({
-                files: [`${struktury_dir}${nazwa}.jpg`],
-              });
+              .send(`🔢Nr.${numer}`);
+            client.channels.cache.get(`999685864919683122`).send({
+              files: [`${struktury_dir}${nazwa}.jpg`],
+            });
           }
-  
+
           if (data.rodzaj == "3") {
             client.channels.cache
               .get(`1004823240851599420`)
-              .send(`🔢Nr.${numer}`)
-            client.channels.cache
-              .get(`1004823240851599420`)
-              .send({
-                files: [`${struktury_dir}${nazwa}.jpg`],
-              });
+              .send(`🔢Nr.${numer}`);
+            client.channels.cache.get(`1004823240851599420`).send({
+              files: [`${struktury_dir}${nazwa}.jpg`],
+            });
           }
         }, 1000);
-        
       });
 
       socket.on("add_polowanie", function (data) {
@@ -282,67 +279,71 @@ module.exports = (client) => {
           JSON.stringify(jsonString)
         );
 
-        client.channels.cache
-          .get(`999685658572496906`)
-          .send(`📌Polowanie nr. ${data.numer}`);
-        client.channels.cache
-          .get(`999685864919683122`)
-          .send(`📌Polowanie nr. ${data.numer}`);
-        client.channels.cache
-          .get(`1004823240851599420`)
-          .send(`📌Polowanie nr. ${data.numer}`);
+        setTimeout(() => {
+          client.channels.cache
+            .get(`999685658572496906`)
+            .send(`📌Polowanie nr. ${data.numer}`);
+          client.channels.cache
+            .get(`999685864919683122`)
+            .send(`📌Polowanie nr. ${data.numer}`);
+          client.channels.cache
+            .get(`1004823240851599420`)
+            .send(`📌Polowanie nr. ${data.numer}`);
 
-        const embedVar = new EmbedBuilder()
-          .setTitle("Polowanie")
-          .setDescription("Dodano nowe polowanie")
-          .setColor(0x88000)
-          .addFields(
-            {
-              name: "🔢Numer",
-              value: data.numer,
-              inline: false,
-            },
-            {
-              name: "📆Data",
-              value: data.data,
-              inline: false,
-            },
-            {
-              name: "🧭Teren",
-              value: data.teren,
-              inline: false,
-            },
-            {
-              name: "💪Myśliwi",
-              value: data.mysliwi,
-              inline: false,
-            },
-            {
-              name: "💸Budżet koła",
-              value: data.budzet,
-              inline: false,
-            },
-            {
-              name: "🚲Przejechany dystans",
-              value: data.dystans,
-              inline: false,
-            },
-            {
-              name: "🔎Znalezione struktury",
-              value: data.znalezione_struktury,
-              inline: false,
-            },
-            {
-              name: "📝Wynik łowów",
-              value: data.wynik,
-              inline: false,
-            }
-          )
-          .setFooter({ text: "Koło Łowieckie Bot - By PioterSky" });
+          const embedVar = new EmbedBuilder()
+            .setTitle("Polowanie")
+            .setDescription("Dodano nowe polowanie")
+            .setColor(0x88000)
+            .addFields(
+              {
+                name: "🔢Numer",
+                value: data.numer,
+                inline: false,
+              },
+              {
+                name: "📆Data",
+                value: data.data,
+                inline: false,
+              },
+              {
+                name: "🧭Teren",
+                value: data.teren,
+                inline: false,
+              },
+              {
+                name: "💪Myśliwi",
+                value: data.mysliwi,
+                inline: false,
+              },
+              {
+                name: "💸Budżet koła",
+                value: data.budzet,
+                inline: false,
+              },
+              {
+                name: "🚲Przejechany dystans",
+                value: data.dystans,
+                inline: false,
+              },
+              {
+                name: "🔎Znalezione struktury",
+                value: data.znalezione_struktury,
+                inline: false,
+              },
+              {
+                name: "📝Wynik łowów",
+                value: data.wynik,
+                inline: false,
+              }
+            )
+            .setFooter({
+              text: "Koło Łowieckie Chrząstawa Bot - By PioterSky",
+            });
 
-        client.channels.cache
-          .get(`999410309108355214`)
-          .send({ embeds: [embedVar] });
+          client.channels.cache
+            .get(`999410309108355214`)
+            .send({ embeds: [embedVar] });
+        }, 1000);
       });
 
       setTimeout(() => {

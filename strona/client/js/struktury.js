@@ -82,10 +82,10 @@ socket.on("struktura", (data) => {
 var szukaj = document.getElementById("szukaj");
 
 function hover(numer) {
-  var div = document.getElementById("div" + numer);
+  // var div = document.getElementById("div" + numer);
 
-  div.style.width = "500px";
-  div.style.height = "500px";
+  // div.style.width = "500px";
+  // div.style.height = "500px";
 
   var img = document.getElementById("img" + numer);
 
@@ -103,10 +103,10 @@ function hover(numer) {
 }
 
 function leave(numer) {
-  var div = document.getElementById("div" + numer);
+  // var div = document.getElementById("div" + numer);
 
-  div.style.width = "350px";
-  div.style.height = "350px";
+  // div.style.width = "350px";
+  // div.style.height = "350px";
 
   var img = document.getElementById("img" + numer);
 

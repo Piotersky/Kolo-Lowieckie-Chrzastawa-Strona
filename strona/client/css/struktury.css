@@ -133,10 +133,6 @@ ul li a:hover .name span {
     transform: translateY(20px);
 }
 
-#hunter {
-    scale: 1.5;
-}
-
 header {
     height: 120px;
     width: 100%;

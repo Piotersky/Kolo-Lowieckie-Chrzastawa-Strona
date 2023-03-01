@@ -50,6 +50,10 @@
           <input placeholder="np. 56.68975" type="text" id="coord_y" />
 
           <br /><br /><br /><button id="add_s_btn">Dodaj!</button>
+
+          <br><br><br><input type="text" placeholder="Usuń strukturę" id="del_str" />
+          <br />Podpowiedź: jeżeli struktura nie ma numeru, wpisz "n?", gdzie ?, to numer, który wyświetla się po najechaniu na nią w zakładce struktury.
+          <br /><br /><button id="del_p_btn">Usuń!</button>
         </li>
         <li>
           <h1>Polowanie</h1>
@@ -103,9 +107,10 @@
             <option value="4">Zły</option>
           </select>
 
-          <br /><br /><br /><button id="add_p_btn">Dodaj!</button>
+          <br /><br /><button id="add_p_btn">Dodaj!</button>
         </li>
       </ul>
+      <a href="data/" download>Pobierz kopię wszystkich struktur i wypraw</a>
     </main>
 
     <script src="/socket.io/socket.io.js"></script>
