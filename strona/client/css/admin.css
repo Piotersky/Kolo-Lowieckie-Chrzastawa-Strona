@@ -1,0 +1,111 @@
+body {
+    text-align: center;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-size: 20px;
+    background-color: rgb(233, 233, 233);
+}
+
+#login {
+    width: 50%;
+    height: 50%;
+
+    position:absolute;
+    left: 20%;
+    top: 30%;
+}
+
+main {
+    width: 0px;
+    height: 0px;
+    margin: 0;
+    visibility: hidden;
+}
+
+h1 {
+    font-size: 40px;
+}
+
+ul{
+	width: 100%;
+    height: 100%;
+    margin-block-start: 0;
+    margin-block-end: 0;
+    padding-inline-start: 0;
+	justify-content: center;
+	margin: 0;
+    display: flex;
+}
+ /* Style the links inside the navigation bar */
+ul li{
+	list-style: none;
+	text-align: center;
+    margin: 0;  
+    border-right: none;
+    width: 50%;
+    height: 100%;
+}
+
+ul li:first-child{
+    border-right: 1px solid rgba(0,0,0,0.2);
+}
+
+button {
+    width: 120px;
+    height: 50px;
+    font-size: 20px;
+    background-color: white;
+    cursor: pointer;
+}
+
+#file
+{
+  padding: 10px;
+  width: 100%;
+}
+
+#file::file-selector-button
+{
+  display: none;
+}
+
+#file::before
+{
+  border: 1px solid black;
+  border-radius: 3px 8px 3px 8px;
+  color: rgb(43, 43, 43);
+  font-size: 20px;
+  content: 'Wybierz zdjęcie';
+  background: rgb(255, 255, 255);
+  margin: 25px;
+  padding: 5px;
+}
+
+#file:hover:before
+{
+  border: 2px groove rgb(90, 3, 0);
+  background: rgb(233, 233, 233);
+}
+
+#file:active:before
+{
+  border: 1px groove rgb(0, 20, 109);   
+}
+
+#data {
+  width: 250px;
+}
+#teren {
+  width: 425px;
+}
+#mysliwi {
+  width: 300px;
+}
+#budzet {
+  width: 200px;
+}
+#dystans {
+  width: 375px;
+}
+#znalezione_struktury {
+  width: 430px;
+}

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link type="text/css" rel="stylesheet" href="client/css/struktury.css" />
+    <link type="image/x-icon" rel="icon" href="client/img/koo_Ch.ico" />
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css"
+    />
+
+    <title>Struktury</title>
+  </head>
+  <body>
+    <header>
+      <ul>
+        <li>
+          <a href="/">
+            <div class="icon">
+              <i
+                class="fa fa-home"
+                aria-hidden="true"
+                style="color: rgb(0, 100, 0)"
+              ></i>
+              <!-- this is home icon link get form fornt-awesome icon for home button -->
+              <i
+                class="fa fa-home"
+                aria-hidden="true"
+                style="color: rgb(0, 100, 0)"
+              ></i>
+              <!-- this is home icon link get form fornt-awesome icon for home button -->
+            </div>
+            <div class="name">
+              <span data-text="Strona główna">Strona główna</span>
+            </div>
+          </a>
+        </li>
+        <li>
+          <a
+            href="https://earth.google.com/earth/d/1W3n87jPRmOSs6HTNmMRkc31ADWTsSSw9?usp=sharing"
+          >
+            <div class="icon">
+              <i
+                class="fa fa-map"
+                aria-hidden="true"
+                style="color: rgb(0, 100, 0)"
+              ></i>
+              <!-- this is home icon link get form fornt-awesome icon for home button -->
+              <i
+                class="fa fa-map"
+                aria-hidden="true"
+                style="color: rgb(0, 100, 0)"
+              ></i>
+              <!-- this is home icon link get form fornt-awesome icon for home button -->
+            </div>
+            <div class="name"><span data-text="Mapa">Mapa</span></div>
+          </a>
+        </li>
+        <li>
+          <a href="/polowania">
+            <div class="icon">
+              <i
+                class="fa fa-calendar"
+                aria-hidden="true"
+                style="color: rgb(0, 100, 0)"
+              ></i
+              ><!-- this is home icon link get form fornt-awesome icon for home button -->
+              <i
+                class="fa fa-calendar"
+                aria-hidden="true"
+                style="color: rgb(0, 100, 0)"
+              ></i
+              ><!-- this is home icon link get form fornt-awesome icon for home button -->
+            </div>
+            <div class="name">
+              <span data-text="Polowania">Polowania</span>
+            </div>
+          </a>
+        </li>
+        <li>
+          <a href="/historia">
+            <div class="icon">
+              <img src="client/img/hunter.png" id="hunter" />
+            </div>
+            <div class="name">
+              <span data-text="Historia Koła">Historia Koła</span>
+            </div>
+          </a>
+        </li>
+      </ul>
+    </header>
+
+    <div id="search-bar">
+      <input
+        type="search"
+        id="znajdz"
+        placeholder="Wpisz numer, aby znaleźć strukturę"
+      />
+      <br />Podpowiedź: zostawienie pola wyszukiwania pustego powoduje pokazanie
+      wszystkich struktur, a wpisanie "n" wyświetla wszystkie nieponumerowane.
+      <div id="rodzaj">
+        <h2>Wyświetlaj tylko:</h2>
+        <label> <input type="checkbox" id="ambony" />Ambony </label>
+        <label> <input type="checkbox" id="zwyżki" />Zwyżki </label>
+        <label> <input type="checkbox" id="wysiadki" />Wysiadki </label>
+        <label> <input type="checkbox" id="wszystkie" checked />Wszystkie </label>
+      </div>
+      
+      <button id="szukaj">Szukaj</button>
+    </div>
+
+    <div id="struktury"></div>
+
+    <footer>
+      <div id="kontakt">
+        <h3>Kontakt:</h3>
+        <h4>Napisz do nas: kl.chrzastawa@gmail.com</h4>
+        <br />
+        <a href="https://discord.gg/92DNSzGnXd">Serwer discord</a>
+      </div>
+      <br />
+      Kopiowanie kodu objętego prawami autorskimi jest nielegalne!
+    </footer>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="client/js/struktury.js"></script>
+  </body>
+</html>
