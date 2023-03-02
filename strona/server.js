@@ -64,19 +64,22 @@ module.exports = (client) => {
         return readFile(filePath);
       }
 
-      async function send(file, fun) {
-        const content = await readFile(struktury_dir + file, "utf8");
+      async function send(type, file, fun) {
+
+        if(await exists(struktury_dir + type + "/" + file) == false) return
+
+        const content = await readFile(struktury_dir + type + "/" + file, "utf8");
 
         if (!content) return;
 
         const json = JSON.parse(content);
-        const img_path = struktury_dir + path.parse(file).name;
+        const img_path = struktury_dir +  + type + "/" + path.parse(file).name;
 
         const buf1 = await getBuffer(`${img_path}.jpg`);
         const buf2 = await getBuffer(`${img_path}.png`);
 
         const data = {
-          numer: json.numer || file,
+          numer: json.numer,
           buffer: (buf1 || buf2).toString("base64"),
           rodzaj: json.rodzaj,
           polowanie: json.polowanie,
@@ -87,9 +90,9 @@ module.exports = (client) => {
         //socket.emit("struktura", data);
       }
 
-      async function files(fun) {
+      async function files(type, fun) {
         try {
-          const files = fs.readdirSync(struktury_dir);
+          const files = fs.readdirSync(`${struktury_dir}/${type}/`);
 
           files.forEach(async (file) => {
             if (file.split(".").pop() === "json") {
@@ -101,18 +104,20 @@ module.exports = (client) => {
         }
       }
 
-      files(function (file) {
-        send(file, function (data) {
-          socket.emit("struktura", data);
+      for (let i = 1; i < 4; i++) {
+        files(i, function (file) {
+          send(i, file, function (data) {
+            socket.emit("struktura", data);
+          });
         });
-      });
+      }
 
       socket.on("search", function (data) {
-        function another(multiple, file) {
+        function another(type, multiple, file) {
           if (data.val == "n") {
             if (multiple) {
-              files(function (file) {
-                send(file, function (data) {
+              files(type, function (file) {
+                send(type, file, function (data) {
                   if (data.numer.startsWith("n")) {
                     socket.emit("struktura", data);
                   }
@@ -120,7 +125,7 @@ module.exports = (client) => {
               });
             }
             if (!multiple) {
-              send(file, function (data) {
+              send(type, file, function (data) {
                 if (data.number.startsWith("n")) {
                   socket.emit("struktura", data);
                 }
@@ -130,14 +135,14 @@ module.exports = (client) => {
           }
           if (data.val == "") {
             if (multiple) {
-              files(function (file) {
-                send(file, function (data) {
+              files(type, function (file) {
+                send(type, file, function (data) {
                   socket.emit("struktura", data);
                 });
               });
             }
             if (!multiple) {
-              send(file, function (data) {
+              send(type, file, function (data) {
                 socket.emit("struktura", data);
               });
             }
@@ -149,17 +154,14 @@ module.exports = (client) => {
           const element = data.rodzaj[i - 1];
 
           if (element) {
-
-            
-
-            files(async function (file) {
-              const content = await readFile(struktury_dir + file, "utf8");
+            files(i, async function (file) {
+              const content = await readFile(struktury_dir + i + "/"+ file, "utf8");
               const json = JSON.parse(content);
               if (json.rodzaj == i) {
-                another(false, file);
+                another(i, false, file);
 
                 if (data.val == json.numer) {
-                  send(file, function (data) {
+                  send(i, file, function (data) {
                     socket.emit("struktura", data);
                   });
                 }
@@ -169,16 +171,16 @@ module.exports = (client) => {
           }
         }
 
-        //console.log(data.rodzaj)
-
-        another(true, "");
+        for (let i = 1; i < 4; i++) {
+        another(i, true, "");
+        }
 
         file = data.val + ".json";
-        if (!fs.existsSync(struktury_dir + file)) return;
-
-        send(file, function (data) {
+        for (let i = 1; i < 4; i++) {
+          send(i, file, function (data) {
           socket.emit("struktura", data);
         });
+        }
       });
     }
 
@@ -186,7 +188,7 @@ module.exports = (client) => {
       logged = false;
 
       socket.on("login", function (data) {
-        log("Try login in: " + socket.handshake.address);
+        log("Try login on: " + socket.handshake.address);
         if (data == "ambony11") {
           logged = true;
           const files = fs.readdirSync(polowania_dir);
@@ -210,56 +212,74 @@ module.exports = (client) => {
         }
 
         jsonString = {
-          numer: data.numer,
+          numer: nazwa,
           rodzaj: data.rodzaj,
           polowanie: data.polowanie,
         };
 
-        fs.writeFileSync(
-          `${struktury_dir}${nazwa}.json`,
-          JSON.stringify(jsonString)
-        );
-
         let base64 = data.img.split(";base64,").pop();
-
-        fs.writeFileSync(`${struktury_dir}${nazwa}.jpg`, base64, {
-          encoding: "base64",
-        });
 
         //log(socket.handshake.address + "created: " + )
 
         let numer = " " + data.numer;
         if (data.numer == "") numer = "Bez numeru";
 
-        setTimeout(() => {
-          if (data.rodzaj == "1") {
-            console.log(numer);
+        if (data.rodzaj == "1") {
+          fs.writeFileSync(
+            `${struktury_dir}1/${nazwa}.json`,
+            JSON.stringify(jsonString)
+          );
+          fs.writeFileSync(`${struktury_dir}1/${nazwa}.jpg`, base64, {
+            encoding: "base64",
+          });
+
+          setTimeout(() => {
             client.channels.cache
               .get(`999685658572496906`)
               .send(`🔢Nr.${numer}`);
             client.channels.cache.get(`999685658572496906`).send({
-              files: [`${struktury_dir}${nazwa}.jpg`],
+              files: [`${struktury_dir}1/${nazwa}.jpg`],
             });
-          }
+          }, 1000);
+        }
 
-          if (data.rodzaj == "2") {
+        if (data.rodzaj == "2") {
+          fs.writeFileSync(
+            `${struktury_dir}2/${nazwa}.json`,
+            JSON.stringify(jsonString)
+          );
+          fs.writeFileSync(`${struktury_dir}2/${nazwa}.jpg`, base64, {
+            encoding: "base64",
+          });
+
+          setTimeout(() => {
             client.channels.cache
               .get(`999685864919683122`)
               .send(`🔢Nr.${numer}`);
             client.channels.cache.get(`999685864919683122`).send({
-              files: [`${struktury_dir}${nazwa}.jpg`],
+              files: [`${struktury_dir}2/${nazwa}.jpg`],
             });
-          }
+          }, 1000);
+        }
 
-          if (data.rodzaj == "3") {
+        if (data.rodzaj == "3") {
+          fs.writeFileSync(
+            `${struktury_dir}3/${nazwa}.json`,
+            JSON.stringify(jsonString)
+          );
+          fs.writeFileSync(`${struktury_dir}3/${nazwa}.jpg`, base64, {
+            encoding: "base64",
+          });
+
+          setTimeout(() => {
             client.channels.cache
               .get(`1004823240851599420`)
               .send(`🔢Nr.${numer}`);
             client.channels.cache.get(`1004823240851599420`).send({
-              files: [`${struktury_dir}${nazwa}.jpg`],
+              files: [`${struktury_dir}3/${nazwa}.jpg`],
             });
-          }
-        }, 1000);
+          }, 1000);
+        }
       });
 
       socket.on("add_polowanie", function (data) {

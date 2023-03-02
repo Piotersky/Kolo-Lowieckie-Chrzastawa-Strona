@@ -9,71 +9,75 @@ const parentDiv = document.getElementById("struktury");
 socket.on("struktura", (data) => {
   let text = "";
   let numer = data.numer;
+  let id;
 
   if (data.numer.startsWith("n")) {
     numer = "bez numeru";
   }
   if (data.rodzaj == 1) {
     text = "Ambona " + numer;
+    id = "A" + data.numer
   }
   if (data.rodzaj == 2) {
     text = "Zwyżka " + numer;
+    id = "Z" + data.numer
   }
   if (data.rodzaj == 3) {
     text = "Wysiadka " + numer;
+    id = "W" + data.numer
   }
 
   if (data.buffer == "") {
     parentDiv.innerHTML +=
       '<div class="struktura" id="div' +
-      data.numer +
+      id +
       '" onmouseleave="leave(' +
       "'" +
-      data.numer +
+      id +
       "'" +
       ')" onmouseover="hover(' +
       "'" +
-      data.numer +
+      id +
       "'" +
       ')"><p class="title" id="title' +
-      data.numer +
+      id +
       '">' +
       text +
       '</p><p class="desc" id="desc' +
-      data.numer +
+      id +
       '">🔢Numer: ' +
-      numer +
+      data.numer +
       "<br>📒Polowanie: " +
       data.polowanie +
       '</p><img id="img' +
-      data.numer +
+      id +
       '" class="img" src="client/img/no_img.png"></div>';
     return;
   }
 
   parentDiv.innerHTML +=
     '<div class="struktura" id="div' +
-    data.numer +
+    id +
     '" onmouseleave="leave(' +
     "'" +
-    data.numer +
+    id +
     "'" +
     ')" onmouseover="hover(' +
     "'" +
-    data.numer +
+    id +
     "'" +
     ')"><p class="title" id="title' +
-    data.numer +
+    id +
     '">' +
     text +
     '</p><p class="desc" id="desc' +
-    data.numer +
+    id +
     '">🔢Numer: ' +
-    numer +
+    data.numer +
     "<br>📒Polowanie: " +
     data.polowanie +
     '</p><img id="img' +
-    data.numer +
+    id +
     '" class="img" src="data:image/png;base64, ' +
     data.buffer +
     '"></div>';
