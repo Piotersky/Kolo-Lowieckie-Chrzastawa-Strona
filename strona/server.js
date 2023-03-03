@@ -242,7 +242,7 @@ module.exports = (client) => {
             client.channels.cache.get(`999685658572496906`).send({
               files: [`${struktury_dir}1/${nazwa}.jpg`],
             });
-          }, 1000);
+          }, 2000);
         }
 
         if (data.rodzaj == "2") {
@@ -261,7 +261,7 @@ module.exports = (client) => {
             client.channels.cache.get(`999685864919683122`).send({
               files: [`${struktury_dir}2/${nazwa}.jpg`],
             });
-          }, 1000);
+          }, 2000);
         }
 
         if (data.rodzaj == "3") {
@@ -280,7 +280,7 @@ module.exports = (client) => {
             client.channels.cache.get(`1004823240851599420`).send({
               files: [`${struktury_dir}3/${nazwa}.jpg`],
             });
-          }, 1000);
+          }, 2000);
         }
       });
 
