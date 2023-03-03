@@ -92,7 +92,7 @@ module.exports = (client) => {
 
       async function files(type, fun) {
         try {
-          const files = fs.readdirSync(`${struktury_dir}/${type}/`);
+          const files = fs.readdirSync(`${struktury_dir}${type}/`);
 
           files.forEach(async (file) => {
             if (file.split(".").pop() === "json") {
