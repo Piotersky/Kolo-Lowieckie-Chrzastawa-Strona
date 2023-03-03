@@ -55,11 +55,11 @@ socket.on("Authenticated", (data) => {
     }
 }*/
 
-var struktura_btn = document.getElementById("add_s_btn");
+var add_struktura_btn = document.getElementById("add_s_btn");
 var file_input = document.getElementById("file");
 
 file_input.addEventListener("change", function () {
-  struktura_btn.addEventListener("click", () => {
+  add_struktura_btn.addEventListener("click", () => {
     const reader = new FileReader();
     reader.addEventListener("load", () => {
       var uploaded_image = reader.result;
@@ -80,8 +80,16 @@ file_input.addEventListener("change", function () {
   });
 });
 
-var polowanie_btn = document.getElementById("add_p_btn");
-polowanie_btn.addEventListener("click", () => {
+document.getElementById("del_s_btn").addEventListener("click", () => {
+  
+  socket.emit("del_struktura", {
+    rodzaj: document.getElementById("rodzaj_del").value,
+    numer: document.getElementById("del_s").value
+  });
+});
+
+var add_polowanie_btn = document.getElementById("add_p_btn");
+add_polowanie_btn.addEventListener("click", () => {
   
   data = {
     numer: document.getElementById("numer_p").value,
@@ -95,6 +103,11 @@ polowanie_btn.addEventListener("click", () => {
   }
 
   socket.emit("add_polowanie", data)
+});
+
+document.getElementById("del_p_btn").addEventListener("click", () => {
+
+  socket.emit("del_polowanie", document.getElementById("del_p").value);
 });
 
 setTimeout(() => {

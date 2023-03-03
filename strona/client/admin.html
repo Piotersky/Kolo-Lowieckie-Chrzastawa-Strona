@@ -51,9 +51,14 @@
 
           <br /><br /><br /><button id="add_s_btn">Dodaj!</button>
 
-          <br><br><br><input type="text" placeholder="Usuń strukturę" id="del_str" />
+          <br><br><br><input type="text" placeholder="Wpisz numer usuwanej struktury" id="del_s" />
           <br />Podpowiedź: jeżeli struktura nie ma numeru, wpisz "n?", gdzie ?, to numer, który wyświetla się po najechaniu na nią w zakładce struktury.
-          <br /><br /><button id="del_p_btn">Usuń!</button>
+          <br />Rodzaj usuwanej struktury<select id="rodzaj_del">
+            <option value="1">Ambona</option>
+            <option value="2">Zwyżka</option>
+            <option value="3">Wysiadka</option>
+          </select>
+          <br /><br /><button id="del_s_btn">Usuń!</button>
         </li>
         <li>
           <h1>Polowanie</h1>
@@ -108,6 +113,9 @@
           </select>
 
           <br /><br /><button id="add_p_btn">Dodaj!</button>
+
+          <br><br><br><input type="text" placeholder="Wpisz numer usuwanego polowania" id="del_p" />
+          <br /><br /><button id="del_p_btn">Usuń!</button>
         </li>
       </ul>
       <a href="data/" download>Pobierz kopię wszystkich struktur i wypraw</a>

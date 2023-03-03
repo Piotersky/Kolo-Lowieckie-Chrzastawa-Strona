@@ -27,8 +27,8 @@ module.exports = (client) => {
     res.sendFile(__dirname + "/client/struktury.html");
   });
 
-  app.get("/historia", cors(), (req, res) => {
-    res.sendFile(__dirname + "/client/historia.html");
+  app.get("/o_nas", cors(), (req, res) => {
+    res.sendFile(__dirname + "/client/o_nas.html");
   });
 
   app.get("/admin", cors(), (req, res) => {
@@ -221,8 +221,10 @@ module.exports = (client) => {
 
         //log(socket.handshake.address + "created: " + )
 
-        let numer = " " + data.numer;
-        if (data.numer == "") numer = "Bez numeru";
+        let numer = "🔢Nr. " + data.numer;
+        if (data.numer == "") {
+          numer = "🔢 Bez numeru";
+        }
 
         if (data.rodzaj == "1") {
           fs.writeFileSync(
@@ -236,7 +238,7 @@ module.exports = (client) => {
           setTimeout(() => {
             client.channels.cache
               .get(`999685658572496906`)
-              .send(`🔢Nr.${numer}`);
+              .send(numer);
             client.channels.cache.get(`999685658572496906`).send({
               files: [`${struktury_dir}1/${nazwa}.jpg`],
             });
@@ -255,7 +257,7 @@ module.exports = (client) => {
           setTimeout(() => {
             client.channels.cache
               .get(`999685864919683122`)
-              .send(`🔢Nr.${numer}`);
+              .send(numer);
             client.channels.cache.get(`999685864919683122`).send({
               files: [`${struktury_dir}2/${nazwa}.jpg`],
             });
@@ -274,13 +276,18 @@ module.exports = (client) => {
           setTimeout(() => {
             client.channels.cache
               .get(`1004823240851599420`)
-              .send(`🔢Nr.${numer}`);
+              .send(numer);
             client.channels.cache.get(`1004823240851599420`).send({
               files: [`${struktury_dir}3/${nazwa}.jpg`],
             });
           }, 1000);
         }
       });
+
+      socket.on("del_struktura", function(data) {
+        fs.unlinkSync(`${struktury_dir}${data.rodzaj}/${data.numer}.json`);
+        fs.unlinkSync(`${struktury_dir}${data.rodzaj}/${data.numer}.jpg`);
+      })
 
       socket.on("add_polowanie", function (data) {
         jsonString = {
@@ -365,6 +372,10 @@ module.exports = (client) => {
             .send({ embeds: [embedVar] });
         }, 1000);
       });
+
+      socket.on("del_polowanie", function(data) {
+        fs.unlinkSync(`${polowania_dir}${data}.json`);
+      })
 
       setTimeout(() => {
         if (!logged) {
