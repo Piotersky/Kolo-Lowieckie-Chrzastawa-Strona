@@ -2,7 +2,6 @@ const express = require("express");
 var cors = require("cors");
 const { Server } = require("socket.io");
 const http = require("http");
-const log = require("../bot/utils/log");
 const { EmbedBuilder } = require("discord.js");
 
 module.exports = (client) => {
@@ -44,7 +43,7 @@ module.exports = (client) => {
   });
 
   io.on("connection", function (socket) {
-    log("connected socket:" + socket.handshake.address);
+    console.log("Connected socket: " + socket.id);
 
     const fs = require("fs");
     const path = require("path");
@@ -65,15 +64,17 @@ module.exports = (client) => {
       }
 
       async function send(type, file, fun) {
+        if ((await exists(struktury_dir + type + "/" + file)) == false) return;
 
-        if(await exists(struktury_dir + type + "/" + file) == false) return
-
-        const content = await readFile(struktury_dir + type + "/" + file, "utf8");
+        const content = await readFile(
+          struktury_dir + type + "/" + file,
+          "utf8"
+        );
 
         if (!content) return;
 
         const json = JSON.parse(content);
-        const img_path = struktury_dir +  + type + "/" + path.parse(file).name;
+        const img_path = struktury_dir + +type + "/" + path.parse(file).name;
 
         const buf1 = await getBuffer(`${img_path}.jpg`);
         const buf2 = await getBuffer(`${img_path}.png`);
@@ -155,7 +156,10 @@ module.exports = (client) => {
 
           if (element) {
             files(i, async function (file) {
-              const content = await readFile(struktury_dir + i + "/"+ file, "utf8");
+              const content = await readFile(
+                struktury_dir + i + "/" + file,
+                "utf8"
+              );
               const json = JSON.parse(content);
               if (json.rodzaj == i) {
                 another(i, false, file);
@@ -172,14 +176,14 @@ module.exports = (client) => {
         }
 
         for (let i = 1; i < 4; i++) {
-        another(i, true, "");
+          another(i, true, "");
         }
 
         file = data.val + ".json";
         for (let i = 1; i < 4; i++) {
           send(i, file, function (data) {
-          socket.emit("struktura", data);
-        });
+            socket.emit("struktura", data);
+          });
         }
       });
     }
@@ -188,13 +192,13 @@ module.exports = (client) => {
       logged = false;
 
       socket.on("login", function (data) {
-        log("Try login on: " + socket.handshake.address);
+        console.log("Try login on: " + socket.id);
         if (data == "ambony11") {
           logged = true;
           const files = fs.readdirSync(polowania_dir);
 
           socket.emit("Authenticated", files);
-          log("Logged on: " + socket.handshake.address);
+          console.log("Logged on: " + socket.id);
         }
       });
 
@@ -236,13 +240,11 @@ module.exports = (client) => {
           });
 
           setTimeout(() => {
-            client.channels.cache
-              .get(`999685658572496906`)
-              .send(numer);
+            client.channels.cache.get(`999685658572496906`).send(numer);
             client.channels.cache.get(`999685658572496906`).send({
               files: [`${struktury_dir}1/${nazwa}.jpg`],
             });
-          }, 2000);
+          }, 1000);
         }
 
         if (data.rodzaj == "2") {
@@ -255,13 +257,11 @@ module.exports = (client) => {
           });
 
           setTimeout(() => {
-            client.channels.cache
-              .get(`999685864919683122`)
-              .send(numer);
+            client.channels.cache.get(`999685864919683122`).send(numer);
             client.channels.cache.get(`999685864919683122`).send({
               files: [`${struktury_dir}2/${nazwa}.jpg`],
             });
-          }, 2000);
+          }, 1000);
         }
 
         if (data.rodzaj == "3") {
@@ -274,20 +274,18 @@ module.exports = (client) => {
           });
 
           setTimeout(() => {
-            client.channels.cache
-              .get(`1004823240851599420`)
-              .send(numer);
+            client.channels.cache.get(`1004823240851599420`).send(numer);
             client.channels.cache.get(`1004823240851599420`).send({
               files: [`${struktury_dir}3/${nazwa}.jpg`],
             });
-          }, 2000);
+          }, 1000);
         }
       });
 
-      socket.on("del_struktura", function(data) {
+      socket.on("del_struktura", function (data) {
         fs.unlinkSync(`${struktury_dir}${data.rodzaj}/${data.numer}.json`);
         fs.unlinkSync(`${struktury_dir}${data.rodzaj}/${data.numer}.jpg`);
-      })
+      });
 
       socket.on("add_polowanie", function (data) {
         jsonString = {
@@ -373,9 +371,29 @@ module.exports = (client) => {
         }, 1000);
       });
 
-      socket.on("del_polowanie", function(data) {
+      socket.on("del_polowanie", function (data) {
         fs.unlinkSync(`${polowania_dir}${data}.json`);
-      })
+      });
+
+      socket.on("backup", async function () {
+
+        console.log("Downloading backup on: " + socket.id);
+
+        const AdmZip = require("adm-zip");
+
+        try {
+          const zip = new AdmZip();
+          const outputDir = "./backup.zip";
+          zip.addLocalFolder("./data/");
+          zip.writeZip(outputDir);
+        } catch (e) {
+          console.log(`Something went wrong ${e}`);
+        }
+
+        data = fs.readFileSync("./backup.zip", { encoding: "base64" });
+
+        socket.emit("backup_file", data);
+      });
 
       setTimeout(() => {
         if (!logged) {
@@ -389,6 +407,6 @@ module.exports = (client) => {
   const port = 10000 || process.env.PORT;
 
   server.listen(port, () => {
-    log(`Listening on port ${port}`);
+    console.log(`Listening on port ${port}`);
   });
 };

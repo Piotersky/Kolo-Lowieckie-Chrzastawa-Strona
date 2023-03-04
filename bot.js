@@ -4,7 +4,6 @@ const config = require("./bot/config.js");
 const { readdirSync } = require("fs")
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v10');
-const log = require("./bot/utils/log")
 
 let token = config.token
 
@@ -29,7 +28,7 @@ client.on("ready", async () => {
         } catch (error) {
             console.error(error);
         }
-    log(`Bot is online!`);
+    console.log(`Bot is online!`);
     require("./strona/server.js")(client);
 })
 
