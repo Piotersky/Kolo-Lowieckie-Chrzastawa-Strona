@@ -5,6 +5,8 @@ const http = require("http");
 const { EmbedBuilder } = require("discord.js");
 
 module.exports = (client) => {
+
+  //Initialize
   const app = express();
   const server = http.createServer(app);
   const io = new Server(server);
@@ -21,35 +23,30 @@ module.exports = (client) => {
   app.get("/", cors(), function (req, res) {
     res.sendFile(__dirname + "/client/index.html");
   });
-
   app.get("/struktury", cors(), (req, res) => {
     res.sendFile(__dirname + "/client/struktury.html");
   });
-
   app.get("/o_nas", cors(), (req, res) => {
     res.sendFile(__dirname + "/client/o_nas.html");
   });
-
   app.get("/admin", cors(), (req, res) => {
     res.sendFile(__dirname + "/client/admin.html");
   });
-
   app.get("/polowania", cors(), (req, res) => {
     res.sendFile(__dirname + "/client/polowania.html");
   });
-
   app.get("/mapa", cors(), (req, res) => {
     res.sendFile(__dirname + "/client/mapa.html");
   });
 
   io.on("connection", function (socket) {
 
+    //Set constants
+
     function log(text) {
       console.log(text);
       client.channels.cache.get(`1081963979091476523`).send(text);
     }
-
-    log(`Connected socket: **${socket.id}**`);
 
     const fs = require("fs");
     const path = require("path");
@@ -58,20 +55,20 @@ module.exports = (client) => {
     const readFile = promisify(fs.readFile);
     const exists = promisify(fs.exists);
 
-    data_dir = "./data/";
-    struktury_dir = data_dir + "struktury/";
-    polowania_dir = data_dir + "polowania/";
+    const data_dir = "./data/";
+    const struktury_dir = data_dir + "struktury/";
+    const polowania_dir = data_dir + "polowania/";
 
     if (socket.handshake.headers["subpage"] === "struktury") {
       log(`Socket **${socket.id}** connected on /struktury`);
 
-      async function getBuffer(filePath) {
+      async function getBuffer(filePath) { //Get img buffer
         const isFile = await exists(filePath);
         if (!isFile) return "";
         return readFile(filePath);
       }
 
-      async function send(type, file, fun) {
+      async function send(type, file, fun) { //Read one file and do function that is an argument
         if ((await exists(struktury_dir + type + "/" + file)) == false) return;
 
         const content = await readFile(
@@ -95,11 +92,9 @@ module.exports = (client) => {
         };
 
         fun(data);
-        //console.log(data.numer)
-        //socket.emit("struktura", data);
       }
 
-      async function files(type, fun) {
+      async function files(type, fun) {//For files in specific folder
         try {
           const files = fs.readdirSync(`${struktury_dir}${type}/`);
 
@@ -113,13 +108,15 @@ module.exports = (client) => {
         }
       }
 
-      for (let i = 1; i < 4; i++) {
+      for (let i = 1; i < 4; i++) { //For all files
         files(i, function (file) {
           send(i, file, function (data) {
             socket.emit("struktura", data);
           });
         });
       }
+
+      //Idk what is that
 
       socket.on("search", function (data) {
         function another(type, multiple, file) {
@@ -207,7 +204,7 @@ module.exports = (client) => {
           logged = true;
           const files = fs.readdirSync(polowania_dir);
 
-          socket.emit("Authenticated", files);
+          socket.emit("Authenticated", files);//Send all polowania's names
           log(`Logged on: **${socket.id}**`);
         }
       });
@@ -216,8 +213,10 @@ module.exports = (client) => {
         nazwa = data.numer;
 
         if (nazwa == "") {
+          //Read last "nieponumerowana" struktura number
           last_file = `${data_dir}last${data.rodzaj}.txt`;
           content = fs.readFileSync(last_file);
+          //Increase number change the file and set filename to it
           nazwa = parseInt(content);
           nazwa += 1;
           nazwa = nazwa.toString();
@@ -232,8 +231,6 @@ module.exports = (client) => {
         };
 
         let base64 = data.img.split(";base64,").pop();
-
-        //log(socket.handshake.address + "created: " + )
 
         let numer = "🔢Nr. " + data.numer;
         if (data.numer == "") {
@@ -405,7 +402,7 @@ module.exports = (client) => {
           console.log(`Something went wrong ${e}`);
         }
 
-        data = fs.readFileSync("./backup.zip", { encoding: "base64" });
+        data = fs.readFileSync("./backup.zip", { encoding: "base64" });//Send zip file in base64
 
         socket.emit("backup_file", data);
       });
@@ -416,6 +413,11 @@ module.exports = (client) => {
           socket.client._remove(socket.id);
         }
       }, 30 * 1000);
+    }
+
+    if (socket.handshake.headers["subpage"] === "polowania") {
+      log(`Socket **${socket.id}** connected on /polowania`);
+
     }
   });
 

@@ -38,23 +38,6 @@ socket.on("Authenticated", (data) => {
   }
 });
 
-/*function handleFiles() {
-
-    let files = this.files
-
-    const fileList = files;
-    console.log(fileList.length)
-
-    for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-
-        const reader = new FileReader();
-        reader.onload = (e) => { 
-            console.log(e.target.result); };
-        reader.readAsDataURL(file);
-    }
-}*/
-
 var add_struktura_btn = document.getElementById("add_s_btn");
 var file_input = document.getElementById("file");
 
