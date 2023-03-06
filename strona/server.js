@@ -43,7 +43,7 @@ module.exports = (client) => {
   });
 
   io.on("connection", function (socket) {
-    console.log("Connected socket: " + socket.id);
+    log("Connected socket: " + socket.id);
 
     const fs = require("fs");
     const path = require("path");
@@ -57,6 +57,8 @@ module.exports = (client) => {
     polowania_dir = data_dir + "polowania/";
 
     if (socket.handshake.headers["subpage"] === "struktury") {
+      log(`Socket ${socket.id} connected on /struktury`);
+
       async function getBuffer(filePath) {
         const isFile = await exists(filePath);
         if (!isFile) return "";
@@ -189,16 +191,18 @@ module.exports = (client) => {
     }
 
     if (socket.handshake.headers["subpage"] === "admin") {
+      log(`Socket ${socket.id} connected on /admin`);
+
       logged = false;
 
       socket.on("login", function (data) {
-        console.log("Try login on: " + socket.id);
+        log("Try login on: " + socket.id);
         if (data == "ambony11") {
           logged = true;
           const files = fs.readdirSync(polowania_dir);
 
           socket.emit("Authenticated", files);
-          console.log("Logged on: " + socket.id);
+          log("Logged on: " + socket.id);
         }
       });
 
@@ -206,7 +210,7 @@ module.exports = (client) => {
         nazwa = data.numer;
 
         if (nazwa == "") {
-          last_file = `${data_dir}last.txt`;
+          last_file = `${data_dir}last${data.rodzaj}.txt`;
           content = fs.readFileSync(last_file);
           nazwa = parseInt(content);
           nazwa += 1;
@@ -280,11 +284,14 @@ module.exports = (client) => {
             });
           }, 1000);
         }
+
+        log(`Added struktura ${nazwa} on: ${socket.id}`);
       });
 
       socket.on("del_struktura", function (data) {
         fs.unlinkSync(`${struktury_dir}${data.rodzaj}/${data.numer}.json`);
         fs.unlinkSync(`${struktury_dir}${data.rodzaj}/${data.numer}.jpg`);
+        log(`Deleted struktura ${nazwa} on: ${socket.id}`);
       });
 
       socket.on("add_polowanie", function (data) {
@@ -369,15 +376,17 @@ module.exports = (client) => {
             .get(`999410309108355214`)
             .send({ embeds: [embedVar] });
         }, 1000);
+
+        log(`Added polowanie ${data.numer} on: ${socket.id}`);
       });
 
       socket.on("del_polowanie", function (data) {
         fs.unlinkSync(`${polowania_dir}${data}.json`);
+        log(`Deleted polowanie ${data} on: ${socket.id}`);
       });
 
       socket.on("backup", async function () {
-
-        console.log("Downloading backup on: " + socket.id);
+        log("Downloading backup on: " + socket.id);
 
         const AdmZip = require("adm-zip");
 
@@ -410,3 +419,8 @@ module.exports = (client) => {
     console.log(`Listening on port ${port}`);
   });
 };
+
+function log(text) {
+  console.log(text);
+  client.channels.cache.get(`1081963979091476523`).send(text);
+}
