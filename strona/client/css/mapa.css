@@ -1,6 +1,17 @@
+html,
 body {
+  height: 100%;
+  margin: 0;
+
   font-family: sans-serif;
   text-align: center;
+}
+.leaflet-container {
+  height: 800px;
+  width: 1200px;
+}
+.leaflet-container {
+  background-color: rgba(255, 0, 0, 0);
 }
 
 /*#title-text {
@@ -151,21 +162,21 @@ main {
 }
 
 footer {
-	width: 100%;
-	height: 200px;
+  width: 100%;
+  height: 200px;
 
-	background-color: rgb(54, 54, 54);
+  background-color: rgb(54, 54, 54);
 
-	color: rgb(180, 180, 180);
+  color: rgb(180, 180, 180);
 
-	text-align: center;
-	margin: 0;
+  text-align: center;
+  margin: 0;
 
-	position: relative;
-	bottom: 10px;
-	right: 0px;
+  position: relative;
+  bottom: 10px;
+  right: 0px;
 
-	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
 #kontakt {
@@ -176,7 +187,7 @@ footer {
 }
 
 a {
-  color: rgb(180, 180, 180);
+  color: rgb(0, 0, 100);
 
   font-size: 20px;
 }
@@ -192,17 +203,6 @@ a:hover {
   font-size: 30px;
 }
 
-.polowanie {
-  width: 100%;
-  height: 500px;
-
-  margin-top: 10px;
-  margin-bottom: 10px;
-
-    border: 3px;
-    border-style: solid;
-    border-color: rgb(114, 114, 114);
-    border-radius: 2px;
-
-    text-align: center;
+.leaflet-bottom leaflet-right {
+  font-size: 30px;
 }

@@ -35,7 +35,7 @@ justify-content: center;
 margin: 0;
   display: flex;
 }
-/* Style the links inside the navigation bar */
+
 ul li{
 list-style: none;
 text-align: center;
@@ -92,7 +92,7 @@ border: 1px groove rgb(0, 20, 109);
 }
 
 #data {
-width: 250px;
+width: 240px;
 }
 #teren {
 width: 425px;
@@ -101,7 +101,7 @@ width: 425px;
 width: 300px;
 }
 #budzet {
-width: 200px;
+width: 180px;
 }
 #dystans {
 width: 375px;

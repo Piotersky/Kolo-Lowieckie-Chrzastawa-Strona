@@ -16,9 +16,87 @@
   </head>
   <body>
 
-    s
+    <nav>
+      <ul>
+          <li>
+              <a href="/">
+                <div class="icon">
+                  <i
+                    class="fa fa-home"
+                    aria-hidden="true"
+                    style="color: rgb(0, 100, 0)"
+                  ></i>
+                  <!-- this is home icon link get form fornt-awesome icon for home button -->
+                  <i
+                    class="fa fa-home"
+                    aria-hidden="true"
+                    style="color: rgb(0, 100, 0)"
+                  ></i>
+                  <!-- this is home icon link get form fornt-awesome icon for home button -->
+                </div>
+                <div class="name">
+                  <span data-text="Strona główna">Strona główna</span>
+                </div>
+              </a>
+            </li>
+        <li>
+          <a
+            href="/mapa"
+          >
+            <div class="icon">
+              <i
+                class="fa fa-map"
+                aria-hidden="true"
+                style="color: rgb(0, 100, 0)"
+              ></i
+              ><!-- this is home icon link get form fornt-awesome icon for home button -->
+              <i
+                class="fa fa-map"
+                aria-hidden="true"
+                style="color: rgb(0, 100, 0)"
+              ></i
+              ><!-- this is home icon link get form fornt-awesome icon for home button -->
+            </div>
+            <div class="name"><span data-text="Mapa">Mapa</span></div>
+          </a>
+        </li>
+        <li>
+          <a href="/struktury">
+            <div class="icon">
+              <img src="client/img/ambona.png" id="ambona" />
+            </div>
+            <div class="name">
+              <span data-text="Struktury">Struktury</span>
+            </div>
+          </a>
+        </li>
+        <li>
+          <a href="/o_nas">
+              <img src="client/img/hunter.png" id="hunter" class="icon"/>
+            <div class="name">
+              <span data-text="O nas">O nas</span>
+            </div>
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <p id="title">Lista wszystkich polowań od 4 sierpnia 2022:</p>
+
+    <div id="polowania"></div>
+
+    <footer>
+      <div id="kontakt">
+        <h3>Kontakt:</h3>
+        <br />
+        Napisz do nas: kl.chrzastawa@gmail.com<br />
+        <!-- <a href="https://discord.gg/92DNSzGnXd">Serwer discord</a> -->
+      </div>
+      <br>Kopiowanie kodu objętego prawami autorskimi jest nielegalne!
+      <br>© 2023 Koło Łowieckie Chrząstawa. All rights reserved. Wszelkie prawa zastrzeżone.
+    </footer>
 
     <script src="/socket.io/socket.io.js"></script>
-    <script src="client/js/struktury.js"></script>
+    <script src="client/js/polowania.js"></script>
   </body>
 </html>

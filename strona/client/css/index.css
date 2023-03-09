@@ -1,6 +1,6 @@
 body {
-  font-family: sans-serif;
-  text-align: center;
+	font-family: sans-serif;
+	text-align: center;
 }
 
 /*#title-text {
@@ -12,59 +12,68 @@ body {
 }*/
 
 #title-box {
+	width: 100%;
+	height: 300px;
 
-  width: 100%;
-  height: 300px;
-
-  /*background: rgba(0, 0, 0, 0.4) url("../img/title.png");
+	/*background: rgba(0, 0, 0, 0.4) url("../img/title.png");
   background-blend-mode: darken;*/
 
-  color: white;
+	color: white;
 
-  /*background-repeat: no-repeat;
+	/*background-repeat: no-repeat;
   background-size: contain;*/
 }
 
-ul{
-	position:absolute;/* set the position of the navigation bar*/
+ul {
+	position: absolute;
+	/* set the position of the navigation bar*/
 	top: 8%;
 	left: 50%;
 	width: 100%;
 	justify-content: center;
-	transform: translate(-50%,-50%);
+	transform: translate(-50%, -50%);
 	margin: 0;
-	padding: 20px 0; /* Adding some padding */
-	background: #fff; /* Add a white background color to the top navigation */
-	display: flex; /* flex Set navigation bar horizontally using the  display tag*/
-	box-shadow: 0 10px 30px rgba(0,0,0,.3)
+	padding: 20px 0;
+	/* Adding some padding */
+	background: #fff;
+	/* Add a white background color to the top navigation */
+	display: flex;
+	/* flex Set navigation bar horizontally using the  display tag*/
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
- /* Style the links inside the navigation bar */
-ul li{
+
+/* Style the links inside the navigation bar */
+ul li {
 	list-style: none;
 	text-align: center;
 	display: block;
-	border-right: 1px solid rgba(0,0,0,0.2);
+	border-right: 1px solid rgba(0, 0, 0, 0.2);
 }
-ul li:last-child{
+
+ul li:last-child {
 	border-right: none;
 }
-ul li a{
+
+ul li a {
 	text-decoration: none;
 	padding: 0 50px;
 	display: block;
 }
+
 /* Style the icon inside the navigation bar */
-ul li a .icon{
-	width: 50px; /* changing the width of the icon */
-	height: 50px; /* changing the height of the icon */
+ul li a .icon {
+	width: 50px;
+	/* changing the width of the icon */
+	height: 50px;
+	/* changing the height of the icon */
 	text-align: center;
-	
+
 	overflow: hidden;
 	margin: 0 auto 10px;
-	
 }
+
 /* set the size, height, width of the icon*/
-ul li a .icon .fa{
+ul li a .icon .fa {
 	width: 100%;
 	height: 100%;
 	line-height: 40px;
@@ -74,32 +83,39 @@ ul li a .icon .fa{
 }
 
 /* Change the color of icon on hover */
-ul li a .icon .fa:last-child{
+ul li a .icon .fa:last-child {
 	color: rgb(0, 100, 0);
 }
+
 /* style the color and transform of the icon on hover */
-ul li a:hover .icon .fa{
-	transform: translateY(-100%); /* translate y to add the hover effect */
+ul li a:hover .icon .fa {
+	transform: translateY(-100%);
+	/* translate y to add the hover effect */
 }
-ul li a .name{
+
+ul li a .name {
 	position: relative;
-	height: 20px; 
+	height: 20px;
 	width: 100%;
 	display: block;
-	overflow: hidden;/*make ul li a .name overflow is hidden*/
+	overflow: hidden;
+	/*make ul li a .name overflow is hidden*/
 }
+
 /*style the font size and set transition of the navigation menu*/
-ul li a .name span{
+ul li a .name span {
 	display: block;
 	position: relative;
 	color: #000;
-	font-size: 18px; /* changing font size */
+	font-size: 18px;
+	/* changing font size */
 	line-height: 20px;
-	transition: 0.5s; /* adding the transition to make it more attractive */
-	
+	transition: 0.5s;
+	/* adding the transition to make it more attractive */
 }
+
 /*set and change position, top, width, left, height color of the 'class'.name span:before*/
-ul li a .name span:before{
+ul li a .name span:before {
 	content: attr(data-text);
 	position: absolute;
 	top: -100%;
@@ -107,17 +123,17 @@ ul li a .name span:before{
 	left: 0;
 	height: 1005;
 	color: rgb(0, 100, 0);
-	
 }
+
 /*style hover effect of ul li a .name span */
-ul li a:hover .name span{
+ul li a:hover .name span {
 	transform: translateY(20px);
 }
 
 #ambona {
-  scale: 1.5;
-  position: relative;
-  top: 10px;
+	scale: 1.5;
+	position: relative;
+	top: 10px;
 }
 
 #hunter {
@@ -131,6 +147,15 @@ footer {
 	background-color: rgb(54, 54, 54);
 
 	color: rgb(180, 180, 180);
+
+	text-align: center;
+	margin: 0;
+
+	position: relative;
+	bottom: 10px;
+	right: 0px;
+
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
 #kontakt {
@@ -150,4 +175,3 @@ a:hover {
 	color: rgb(0, 0, 100);
 	text-decoration: none;
 }
-
