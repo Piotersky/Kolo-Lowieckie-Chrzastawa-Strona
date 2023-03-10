@@ -51,12 +51,11 @@ file_input.addEventListener("change", function () {
         img: uploaded_image,
         numer: document.getElementById("numer_s").value,
         rodzaj: document.getElementById("rodzaj").value,
-        coord_x: document.getElementById("coord_x").value,
-        coord_y: document.getElementById("coord_y").value,
+        longitude: document.getElementById("longitude").value,
+        latitude: document.getElementById("latitude").value,
         polowanie: document.getElementById("polowanie").value,
       };
-
-      console.log(data);
+      
       socket.emit("add_struktura", data);
     });
     reader.readAsDataURL(this.files[0]);
@@ -118,11 +117,11 @@ socket.on('backup_file', function(data) {
   document.body.append(anchor);
   anchor.style = "display: none;";
 
+  backup_text.innerText = "Trwa pobieranie pliku..."
   var url = window.URL.createObjectURL(blob)
   anchor.href = url;
   anchor.download = 'backup.zip';
   anchor.click();
-  backup_text.innerText = "Trwa pobieranie pliku..."
 
   window.URL.revokeObjectURL(url);
   backup_text.innerText = "Pobierz kopię wszystkich struktur i wypraw:";
