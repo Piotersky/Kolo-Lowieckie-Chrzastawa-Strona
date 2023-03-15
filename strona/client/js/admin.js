@@ -55,7 +55,9 @@ file_input.addEventListener("change", function () {
         latitude: document.getElementById("latitude").value,
         polowanie: document.getElementById("polowanie").value,
       };
-      
+
+      console.log(data);
+
       socket.emit("add_struktura", data);
     });
     reader.readAsDataURL(this.files[0]);
@@ -63,16 +65,14 @@ file_input.addEventListener("change", function () {
 });
 
 document.getElementById("del_s_btn").addEventListener("click", () => {
-  
   socket.emit("del_struktura", {
     rodzaj: document.getElementById("rodzaj_del").value,
-    numer: document.getElementById("del_s").value
+    numer: document.getElementById("del_s").value,
   });
 });
 
 var add_polowanie_btn = document.getElementById("add_p_btn");
 add_polowanie_btn.addEventListener("click", () => {
-  
   data = {
     numer: document.getElementById("numer_p").value,
     data: document.getElementById("data").value,
@@ -81,51 +81,50 @@ add_polowanie_btn.addEventListener("click", () => {
     budzet: document.getElementById("budzet").value,
     dystans: document.getElementById("dystans").value,
     znalezione_struktury: document.getElementById("znalezione_struktury").value,
-    wynik: document.getElementById("wynik").value
-  }
+    wynik: document.getElementById("wynik").value,
+  };
 
-  socket.emit("add_polowanie", data)
+  socket.emit("add_polowanie", data);
 });
 
 document.getElementById("del_p_btn").addEventListener("click", () => {
-
   socket.emit("del_polowanie", document.getElementById("del_p").value);
 });
 
-var backup_btn = document.getElementById('backup');
-var backup_text = document.getElementById('backup_text');
-backup_btn.addEventListener('click', () => {
-  socket.emit('backup');
-  backup_text.innerText = "Poczekaj, trwa tworzenie pliku zip..."
-})
+var backup_btn = document.getElementById("backup");
+var backup_text = document.getElementById("backup_text");
+backup_btn.addEventListener("click", () => {
+  socket.emit("backup");
+  backup_text.innerText = "Poczekaj, trwa tworzenie pliku zip...";
+});
 
-socket.on('backup_file', function(data) {
-  backup_text.innerText = "Trwa konwertowanie pliku..."
+socket.on("backup_file", function (data) {
+  backup_text.innerText = "Trwa konwertowanie pliku...";
 
   var binary = atob(data);
   var bin_length = binary.length;
-  var bytes = new Uint8Array(bin_length)
+  var bytes = new Uint8Array(bin_length);
 
   for (let i = 0; i < bin_length; i++) {
-    bytes[i] = binary.charCodeAt(i); 
+    bytes[i] = binary.charCodeAt(i);
   }
-  
+
   var file_bytes = bytes.buffer;
-  var blob = new Blob([file_bytes], {"type":"octet/stream"})
+  var blob = new Blob([file_bytes], { type: "octet/stream" });
 
   var anchor = document.createElement("a");
   document.body.append(anchor);
   anchor.style = "display: none;";
 
-  backup_text.innerText = "Trwa pobieranie pliku..."
-  var url = window.URL.createObjectURL(blob)
+  backup_text.innerText = "Trwa pobieranie pliku...";
+  var url = window.URL.createObjectURL(blob);
   anchor.href = url;
-  anchor.download = 'backup.zip';
+  anchor.download = "backup.zip";
   anchor.click();
 
   window.URL.revokeObjectURL(url);
   backup_text.innerText = "Pobierz kopię wszystkich struktur i wypraw:";
-})
+});
 
 setTimeout(() => {
   if (logged == false) {

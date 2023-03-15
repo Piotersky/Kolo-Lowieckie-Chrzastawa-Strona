@@ -8,7 +8,9 @@ module.exports = (client) => {
   //Initialize
   const app = express();
   const server = http.createServer(app);
-  const io = new Server(server);
+  const io = new Server(server, {
+    maxHttpBufferSize: 1e8
+  });
 
   app.options(
     "*",
@@ -298,6 +300,7 @@ module.exports = (client) => {
       });
 
       socket.on("del_struktura", function (data) {
+        if(fs.existsSync(`${struktury_dir}${data.rodzaj}/${data.numer}.json`) == false || fs.existsSync(`${struktury_dir}${data.rodzaj}/${data.numer}.jpg`) == false) return;
         fs.unlinkSync(`${struktury_dir}${data.rodzaj}/${data.numer}.json`);
         fs.unlinkSync(`${struktury_dir}${data.rodzaj}/${data.numer}.jpg`);
         log(`Deleted struktura *${data.numer}* on: **${socket.id}**`);
@@ -404,6 +407,7 @@ module.exports = (client) => {
       });
 
       socket.on("del_polowanie", function (data) {
+        if(fs.existsSync(`${polowania_dir}${data}.json`) == false) return;
         fs.unlinkSync(`${polowania_dir}${data}.json`);
         log(`Deleted polowanie *${data}* on: **${socket.id}**`);
       });
