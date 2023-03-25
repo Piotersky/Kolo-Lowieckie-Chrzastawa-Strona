@@ -16,16 +16,19 @@ socket.on("struktura", (data) => {
   }
   if (data.rodzaj == 1) {
     text = "Ambona " + numer;
-    id = "A" + data.numer
+    id = "A" + data.numer;
   }
   if (data.rodzaj == 2) {
     text = "Zwyżka " + numer;
-    id = "Z" + data.numer
+    id = "Z" + data.numer;
   }
   if (data.rodzaj == 3) {
     text = "Wysiadka " + numer;
-    id = "W" + data.numer
+    id = "W" + data.numer;
   }
+
+  polowanie = data.polowanie;
+  if(data.polowanie == 0) polowanie = "przed zaczęciem zapisywania"
 
   if (data.buffer == "") {
     parentDiv.innerHTML +=
@@ -47,8 +50,12 @@ socket.on("struktura", (data) => {
       id +
       '">🔢Numer: ' +
       data.numer +
+      "<br>🌐Szerokość geograficzna: " +
+      data.latitude +
+      "<br>🌐Długość geograficzna: " +
+      data.longitude +
       "<br>📒Polowanie: " +
-      data.polowanie +
+      polowanie +
       '</p><img id="img' +
       id +
       '" class="img" src="client/img/no_img.png"></div>';
@@ -75,7 +82,11 @@ socket.on("struktura", (data) => {
     '">🔢Numer: ' +
     data.numer +
     "<br>📒Polowanie: " +
-    data.polowanie +
+    polowanie +
+    "<br>🌐Szerokość geograficzna: " +
+    data.latitude +
+    "<br>🌐Długość geograficzna: " +
+    data.longitude +
     '</p><img id="img' +
     id +
     '" class="img" src="data:image/png;base64, ' +
@@ -86,10 +97,6 @@ socket.on("struktura", (data) => {
 var szukaj = document.getElementById("szukaj");
 
 function hover(numer) {
-  // var div = document.getElementById("div" + numer);
-
-  // div.style.width = "500px";
-  // div.style.height = "500px";
 
   var img = document.getElementById("img" + numer);
 
@@ -107,10 +114,6 @@ function hover(numer) {
 }
 
 function leave(numer) {
-  // var div = document.getElementById("div" + numer);
-
-  // div.style.width = "350px";
-  // div.style.height = "350px";
 
   var img = document.getElementById("img" + numer);
 
@@ -128,22 +131,11 @@ function leave(numer) {
 }
 
 szukaj.addEventListener("click", () => {
-  const struktury = Array.from(document.getElementsByClassName("struktura"));
-
-  struktury.forEach((div) => {
-    div.remove();
-  });
 
   ambony = document.getElementById("ambony").checked;
   zwyżki = document.getElementById("zwyżki").checked;
   wysiadki = document.getElementById("wysiadki").checked;
   wszystkie = document.getElementById("wszystkie").checked;
-
-  /*array = [false, false, true, false]
-
-  console.log(array[2])
-
-  checked = "wszystkie"*/
 
   array = [ambony, zwyżki, wysiadki, wszystkie];
 
@@ -153,6 +145,10 @@ szukaj.addEventListener("click", () => {
   };
 
   socket.emit("search", search);
-});
 
-//window.location.reload()
+  const struktury = Array.from(document.getElementsByClassName("struktura"));
+
+  struktury.forEach((div) => {
+    div.remove();
+  });
+});

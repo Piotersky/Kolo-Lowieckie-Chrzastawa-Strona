@@ -3,13 +3,17 @@ var cors = require("cors");
 const { Server } = require("socket.io");
 const http = require("http");
 const { EmbedBuilder } = require("discord.js");
+const fs = require("fs");
+const path = require("path");
+const { exec } = require("child_process");
+const { promisify } = require("util");
 
 module.exports = (client) => {
   //Initialize
   const app = express();
   const server = http.createServer(app);
   const io = new Server(server, {
-    maxHttpBufferSize: 1e8
+    maxHttpBufferSize: 1e8,
   });
 
   app.options(
@@ -48,10 +52,6 @@ module.exports = (client) => {
       client.channels.cache.get(`1081963979091476523`).send(text);
     }
 
-    const fs = require("fs");
-    const path = require("path");
-
-    const { promisify } = require("util");
     const readFile = promisify(fs.readFile);
     const exists = promisify(fs.exists);
 
@@ -83,12 +83,11 @@ module.exports = (client) => {
         const json = JSON.parse(content);
         const img_path = struktury_dir + +type + "/" + path.parse(file).name;
 
-        const buf1 = await getBuffer(`${img_path}.jpg`);
-        const buf2 = await getBuffer(`${img_path}.png`);
+        const buf = await getBuffer(`${img_path}.jpg`);
 
         const data = {
           numer: json.numer,
-          buffer: (buf1 || buf2).toString("base64"),
+          buffer: buf.toString("base64"),
           rodzaj: json.rodzaj,
           longitude: json.longitude,
           latitude: json.latitude,
@@ -215,6 +214,29 @@ module.exports = (client) => {
         }
       });
 
+      function commit() {
+        fs.writeFileSync('./data/s.txt', 's')
+        setTimeout(() => {
+          fs.unlinkSync('./data/s.txt')
+
+          exec('git add data', (error, stdout, strerr) => {
+            console.log(error)
+            console.log(stdout);
+            console.log(strerr);
+          });
+          exec('git commit -m "auto commit"', (error, stdout, strerr) => {
+            console.log(error)
+            console.log(stdout);
+            console.log(strerr);
+          });
+          exec('git push origin main', (error, stdout, strerr) => {
+            console.log(error)
+            console.log(stdout);
+            console.log(strerr);
+          });
+        }, 1000)
+      }
+
       socket.on("add_struktura", function (data) {
         nazwa = data.numer;
 
@@ -297,13 +319,21 @@ module.exports = (client) => {
         }
 
         log(`Added struktura *${nazwa}* on: **${socket.id}**`);
+        commit()
       });
 
       socket.on("del_struktura", function (data) {
-        if(fs.existsSync(`${struktury_dir}${data.rodzaj}/${data.numer}.json`) == false || fs.existsSync(`${struktury_dir}${data.rodzaj}/${data.numer}.jpg`) == false) return;
+        if (
+          fs.existsSync(`${struktury_dir}${data.rodzaj}/${data.numer}.json`) ==
+            false ||
+          fs.existsSync(`${struktury_dir}${data.rodzaj}/${data.numer}.jpg`) ==
+            false
+        )
+          return;
         fs.unlinkSync(`${struktury_dir}${data.rodzaj}/${data.numer}.json`);
         fs.unlinkSync(`${struktury_dir}${data.rodzaj}/${data.numer}.jpg`);
         log(`Deleted struktura *${data.numer}* on: **${socket.id}**`);
+        commit()
       });
 
       socket.on("add_polowanie", function (data) {
@@ -401,15 +431,17 @@ module.exports = (client) => {
           client.channels.cache
             .get(`999410309108355214`)
             .send({ embeds: [embedVar] });
+          commit()
         }, 1000);
 
         log(`Added polowanie *${data.numer}* on: **${socket.id}**`);
       });
 
       socket.on("del_polowanie", function (data) {
-        if(fs.existsSync(`${polowania_dir}${data}.json`) == false) return;
+        if (fs.existsSync(`${polowania_dir}${data}.json`) == false) return;
         fs.unlinkSync(`${polowania_dir}${data}.json`);
         log(`Deleted polowanie *${data}* on: **${socket.id}**`);
+        commit()
       });
 
       socket.on("backup", async function () {
