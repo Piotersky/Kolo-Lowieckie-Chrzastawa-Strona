@@ -414,7 +414,7 @@ module.exports = (client) => {
                 inline: false,
               },
               {
-                name: "🔎Znalezione struktury",
+                name: "🔎Znalezione ambony, zwyżki, wysiadki",
                 value: data.znalezione_struktury,
                 inline: false,
               },
