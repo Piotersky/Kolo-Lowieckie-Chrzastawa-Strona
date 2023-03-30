@@ -57,40 +57,6 @@ module.exports = (client) => {
     .then((result) => console.log("Connected to MongoDB"))
     .catch((err) => console.log(err));
 
-  let newLast = new last({
-    numer: 0,
-    rodzaj: 1,
-  });
-
-  newLast
-    .save()
-    .then()
-    .catch((err) => {
-      console.error(err);
-    });
-  newLast = new last({
-    numer: 0,
-    rodzaj: 2,
-  });
-
-  newLast
-    .save()
-    .then()
-    .catch((err) => {
-      console.error(err);
-    });
-  newLast = new last({
-    numer: 0,
-    rodzaj: 3,
-  });
-
-  newLast
-    .save()
-    .then()
-    .catch((err) => {
-      console.error(err);
-    });
-
   io.on("connection", function (socket) {
 
     function log(text) {
