@@ -4,9 +4,13 @@ const { Server } = require("socket.io");
 const http = require("http");
 const { EmbedBuilder } = require("discord.js");
 const fs = require("fs");
-const path = require("path");
-const { exec } = require("child_process");
-const { promisify } = require("util");
+// const path = require("path");
+// const { promisify } = require("util");
+const mongoose = require("mongoose");
+const config = require("../bot/config.js");
+const polowanie = require("./polowanie_schema.js");
+const struktura = require("./struktura_schema.js");
+const last = require("./last_schema.js");
 
 module.exports = (client) => {
   //Initialize
@@ -44,157 +48,265 @@ module.exports = (client) => {
     res.sendFile(__dirname + "/client/mapa.html");
   });
 
+  //MongoDB
+
+  const uri = `mongodb+srv://${config.username}:${config.password}@cluster0.8kcmsxz.mongodb.net/data?retryWrites=true&w=majority`;
+
+  mongoose
+    .connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
+    .then((result) => console.log("Connected to MongoDB"))
+    .catch((err) => console.log(err));
+
+  let newLast = new last({
+    numer: 0,
+    rodzaj: 1,
+  });
+
+  newLast
+    .save()
+    .then()
+    .catch((err) => {
+      console.error(err);
+    });
+  newLast = new last({
+    numer: 0,
+    rodzaj: 2,
+  });
+
+  newLast
+    .save()
+    .then()
+    .catch((err) => {
+      console.error(err);
+    });
+  newLast = new last({
+    numer: 0,
+    rodzaj: 3,
+  });
+
+  newLast
+    .save()
+    .then()
+    .catch((err) => {
+      console.error(err);
+    });
+
   io.on("connection", function (socket) {
-    //Set constants
 
     function log(text) {
       console.log(text);
       client.channels.cache.get(`1081963979091476523`).send(text);
     }
 
-    const readFile = promisify(fs.readFile);
-    const exists = promisify(fs.exists);
+    // const readFile = promisify(fs.readFile);
+    // const exists = promisify(fs.exists);
 
-    const data_dir = "./data/";
-    const struktury_dir = data_dir + "struktury/";
-    const polowania_dir = data_dir + "polowania/";
+    // const data_dir = "./data/";
+    // const struktury_dir = data_dir + "struktury/";
+    // const polowania_dir = data_dir + "polowania/";
 
     if (socket.handshake.headers["subpage"] === "struktury") {
       log(`Socket **${socket.id}** connected on /struktury`);
 
-      async function getBuffer(filePath) {
-        //Get img buffer
-        const isFile = await exists(filePath);
-        if (!isFile) return "";
-        return readFile(filePath);
-      }
+      // async function getBuffer(filePath) {
+      //   //Get img buffer
+      //   const isFile = await exists(filePath);
+      //   if (!isFile) return "";
+      //   return readFile(filePath);
+      // }
 
-      async function send(type, file, fun) {
-        //Read one file and do function that is an argument
-        if ((await exists(struktury_dir + type + "/" + file)) == false) return;
+      // async function send(type, file, fun) {
+      //   //Read one file and do function that is an argument
+      //   if ((await exists(struktury_dir + type + "/" + file)) == false) return;
 
-        const content = await readFile(
-          struktury_dir + type + "/" + file,
-          "utf8"
-        );
+      //   const content = await readFile(
+      //     struktury_dir + type + "/" + file,
+      //     "utf8"
+      //   );
 
-        if (!content) return;
+      //   if (!content) return;
 
-        const json = JSON.parse(content);
-        const img_path = struktury_dir + +type + "/" + path.parse(file).name;
+      //   const json = JSON.parse(content);
+      //   const img_path = struktury_dir + +type + "/" + path.parse(file).name;
 
-        const buf = await getBuffer(`${img_path}.jpg`);
+      //   const buf = await getBuffer(`${img_path}.jpg`);
 
+      //   const data = {
+      //     numer: json.numer,
+      //     buffer: buf.toString("base64"),
+      //     rodzaj: json.rodzaj,
+      //     longitude: json.longitude,
+      //     latitude: json.latitude,
+      //     polowanie: json.polowanie,
+      //   };
+
+      //   fun(data);
+      // }
+
+      // async function files(type, fun) {
+      //   //For files in specific folder
+      //   try {
+      //     const files = fs.readdirSync(`${struktury_dir}${type}/`);
+
+      //     files.forEach(async (file) => {
+      //       if (file.split(".").pop() === "json") {
+      //         await fun(file);
+      //       }
+      //     });
+      //   } catch (err) {
+      //     console.log(err);
+      //   }
+      // }
+
+      // for (let i = 1; i < 4; i++) {
+      //   //For all files
+      //   files(i, function (file) {
+      //     send(i, file, function (data) {
+      //       socket.emit("struktura", data);
+      //     });
+      //   });
+      // }
+
+      async function send(element) {
         const data = {
-          numer: json.numer,
-          buffer: buf.toString("base64"),
-          rodzaj: json.rodzaj,
-          longitude: json.longitude,
-          latitude: json.latitude,
-          polowanie: json.polowanie,
+          numer: element.numer,
+          rodzaj: element.rodzaj,
+          polowanie: element.polowanie,
+          longitude: element.longitude,
+          latitude: element.latitude,
+          buffer: element.photo,
         };
-
-        fun(data);
+        socket.emit("struktura", data);
       }
 
-      async function files(type, fun) {
-        //For files in specific folder
-        try {
-          const files = fs.readdirSync(`${struktury_dir}${type}/`);
-
-          files.forEach(async (file) => {
-            if (file.split(".").pop() === "json") {
-              await fun(file);
-            }
-          });
-        } catch (err) {
-          console.log(err);
-        }
-      }
-
-      for (let i = 1; i < 4; i++) {
-        //For all files
-        files(i, function (file) {
-          send(i, file, function (data) {
-            socket.emit("struktura", data);
-          });
+      function all() {
+        struktura.find().then(async (result) => {
+          for (let i = 0; i < result.length; i++) {
+            const element = result[i];
+            await send(element);
+          }
         });
       }
 
-      //Idk what is that
+      all()
 
+      //On search
       socket.on("search", function (data) {
-        function another(type, multiple, file) {
-          if (data.val == "n") {
-            if (multiple) {
-              files(type, function (file) {
-                send(type, file, function (data) {
-                  if (data.numer.startsWith("n")) {
-                    socket.emit("struktura", data);
+
+        if (data.val == "" && data.rodzaj[3]) {
+          all();
+          return;
+        }
+
+        //Only one type
+        if(data.val == "") {
+          for (let i = 1; i < 4; i++) {
+            const element = data.rodzaj[i - 1];
+            const rodzaj = i;
+            if (element) {
+              struktura.find().then(async (result) => {
+                for (let i = 0; i < result.length; i++) {
+                  const element = result[i];
+                  if (element.rodzaj == rodzaj) {
+                    await send(element);
                   }
-                });
-              });
-            }
-            if (!multiple) {
-              send(type, file, function (data) {
-                if (data.number.startsWith("n")) {
-                  socket.emit("struktura", data);
                 }
               });
             }
-            return;
           }
-          if (data.val == "") {
-            if (multiple) {
-              files(type, function (file) {
-                send(type, file, function (data) {
-                  socket.emit("struktura", data);
-                });
-              });
+          return;
+        }
+
+        //All types but with this name
+        if (data.rodzaj[3]) {
+          struktura.find().then(async (result) => {
+            for (let i = 0; i < result.length; i++) {
+              const element = result[i];
+              if (element.numer == data.val) {
+                await send(element);
+              }
             }
-            if (!multiple) {
-              send(type, file, function (data) {
-                socket.emit("struktura", data);
-              });
-            }
-            return;
-          }
+          });
+          return;
         }
 
         for (let i = 1; i < 4; i++) {
           const element = data.rodzaj[i - 1];
-
+          const rodzaj = i;
           if (element) {
-            files(i, async function (file) {
-              const content = await readFile(
-                struktury_dir + i + "/" + file,
-                "utf8"
-              );
-              const json = JSON.parse(content);
-              if (json.rodzaj == i) {
-                another(i, false, file);
-
-                if (data.val == json.numer) {
-                  send(i, file, function (data) {
-                    socket.emit("struktura", data);
-                  });
+            struktura.find().then(async (result) => {
+              for (let i = 0; i < result.length; i++) {
+                const element = result[i];
+                if (element.rodzaj == rodzaj) {
+                  await send(element);
                 }
               }
             });
-            return;
           }
         }
 
-        for (let i = 1; i < 4; i++) {
-          another(i, true, "");
-        }
+        // function another(type, multiple, file) {
+        //   if (data.val == "n") {
+        //     if (multiple) {
+        //       files(type, function (file) {
+        //         send(type, file, function (data) {
+        //           if (data.numer.startsWith("n")) {
+        //             socket.emit("struktura", data);
+        //           }
+        //         });
+        //       });
+        //     }
+        //     if (!multiple) {
+        //       send(type, file, function (data) {
+        //         if (data.number.startsWith("n")) {
+        //           socket.emit("struktura", data);
+        //         }
+        //       });
+        //     }
+        //     return;
+        //   }
+        //   if (data.val == "") {
+        //     if (multiple) {
+        //       files(type, function (file) {
+        //         send(type, file, function (data) {
+        //           socket.emit("struktura", data);
+        //         });
+        //       });
+        //     }
+        //     if (!multiple) {
+        //       send(type, file, function (data) {
+        //         socket.emit("struktura", data);
+        //       });
+        //     }
+        //     return;
+        //   }
+        // }
 
-        file = data.val + ".json";
-        for (let i = 1; i < 4; i++) {
-          send(i, file, function (data) {
-            socket.emit("struktura", data);
-          });
-        }
+        // for (let i = 1; i < 4; i++) {
+        //   const element = data.rodzaj[i - 1];
+
+        //   if (element) {
+        //     struktura.find().then(async (result) => {
+        //       for (let i = 0; i < result.length; i++) {
+        //         const element = result[i];
+        //         if (element.rodzaj == i) {
+        //           await send(element);
+        //         }
+        //       }
+        //     });
+        //   }
+        // }
+
+        // for (let i = 1; i < 4; i++) {
+        //   another(i, true, "");
+        // }
+
+        // file = data.val + ".json";
+        // for (let i = 1; i < 4; i++) {
+        //   send(i, file, function (data) {
+        //     socket.emit("struktura", data);
+        //   });
+        // }
       });
     }
 
@@ -207,77 +319,68 @@ module.exports = (client) => {
         log(`Try login on: **${socket.id}**`);
         if (data == "ambony11") {
           logged = true;
-          const files = fs.readdirSync(polowania_dir);
 
-          socket.emit("Authenticated", files); //Send all polowania's names
+          socket.emit("Authenticated");
           log(`Logged on: **${socket.id}**`);
         }
       });
 
-      function commit() {
-        fs.writeFileSync('./data/s.txt', 's')
-        setTimeout(() => {
-          fs.unlinkSync('./data/s.txt')
+      socket.on("add_struktura", async function (data) {
+        let number = 0;
+        let nazwa = data.numer;
 
-          exec('git add data', (error, stdout, strerr) => {
-            console.log(error)
-            console.log(stdout);
-            console.log(strerr);
-          });
-          exec('git commit -m "auto commit"', (error, stdout, strerr) => {
-            console.log(error)
-            console.log(stdout);
-            console.log(strerr);
-          });
-          exec('git push origin main', (error, stdout, strerr) => {
-            console.log(error)
-            console.log(stdout);
-            console.log(strerr);
-          });
-        }, 1000)
-      }
-
-      socket.on("add_struktura", function (data) {
-        nazwa = data.numer;
-
-        if (nazwa == "") {
+        if (data.numer == "") {
           //Read last "nieponumerowana" struktura number
-          last_file = `${data_dir}last${data.rodzaj}.txt`;
-          content = fs.readFileSync(last_file);
-          //Increase number change the file and set filename to it
-          nazwa = parseInt(content);
-          nazwa += 1;
-          nazwa = nazwa.toString();
-          fs.writeFileSync(last_file, nazwa);
+          await last.find({ rodzaj: data.rodzaj }).then((result) => {
+            number = result[0].numer + 1;
+          });
+
+          await last.deleteMany({ rodzaj: data.rodzaj });
+
+          const newLast = new last({
+            numer: number,
+            rodzaj: data.rodzaj,
+          });
+
+          newLast
+            .save()
+            .then()
+            .catch((err) => {
+              console.error(err);
+            });
+
+          nazwa = number.toString();
           nazwa = "n" + nazwa;
         }
 
-        jsonString = {
+        let base64 = data.img.split(";base64,").pop();
+
+        const newStruktura = new struktura({
           numer: nazwa,
           rodzaj: data.rodzaj,
           longitude: data.longitude,
           latitude: data.latitude,
           polowanie: data.polowanie,
-        };
+          photo: base64,
+        });
 
-        let base64 = data.img.split(";base64,").pop();
+        newStruktura
+          .save()
+          .then()
+          .catch((err) => {
+            console.error(err);
+          });
 
-        let numer = "🔢Nr. " + data.numer;
-        if (data.numer == "") {
-          numer = "🔢 Bez numeru";
-        }
+        let discord = "🔢Nr. " + data.numer;
+        if (data.numer == "") discord = "🔢 Bez numeru";
 
         if (data.rodzaj == "1") {
-          fs.writeFileSync(
-            `${struktury_dir}1/${nazwa}.json`,
-            JSON.stringify(jsonString)
-          );
           fs.writeFileSync(`${struktury_dir}1/${nazwa}.jpg`, base64, {
             encoding: "base64",
           });
 
           setTimeout(() => {
-            client.channels.cache.get(`999685658572496906`).send(numer);
+            client.channels.cache.get(`999685658572496906`).send(discord);
             client.channels.cache.get(`999685658572496906`).send({
               files: [`${struktury_dir}1/${nazwa}.jpg`],
             });
@@ -285,16 +388,12 @@ module.exports = (client) => {
         }
 
         if (data.rodzaj == "2") {
-          fs.writeFileSync(
-            `${struktury_dir}2/${nazwa}.json`,
-            JSON.stringify(jsonString)
-          );
           fs.writeFileSync(`${struktury_dir}2/${nazwa}.jpg`, base64, {
             encoding: "base64",
           });
 
           setTimeout(() => {
-            client.channels.cache.get(`999685864919683122`).send(numer);
+            client.channels.cache.get(`999685864919683122`).send(discord);
             client.channels.cache.get(`999685864919683122`).send({
               files: [`${struktury_dir}2/${nazwa}.jpg`],
             });
@@ -302,16 +401,12 @@ module.exports = (client) => {
         }
 
         if (data.rodzaj == "3") {
-          fs.writeFileSync(
-            `${struktury_dir}3/${nazwa}.json`,
-            JSON.stringify(jsonString)
-          );
           fs.writeFileSync(`${struktury_dir}3/${nazwa}.jpg`, base64, {
             encoding: "base64",
           });
 
           setTimeout(() => {
-            client.channels.cache.get(`1004823240851599420`).send(numer);
+            client.channels.cache.get(`1004823240851599420`).send(discord);
             client.channels.cache.get(`1004823240851599420`).send({
               files: [`${struktury_dir}3/${nazwa}.jpg`],
             });
@@ -319,25 +414,15 @@ module.exports = (client) => {
         }
 
         log(`Added struktura *${nazwa}* on: **${socket.id}**`);
-        commit()
       });
 
-      socket.on("del_struktura", function (data) {
-        if (
-          fs.existsSync(`${struktury_dir}${data.rodzaj}/${data.numer}.json`) ==
-            false ||
-          fs.existsSync(`${struktury_dir}${data.rodzaj}/${data.numer}.jpg`) ==
-            false
-        )
-          return;
-        fs.unlinkSync(`${struktury_dir}${data.rodzaj}/${data.numer}.json`);
-        fs.unlinkSync(`${struktury_dir}${data.rodzaj}/${data.numer}.jpg`);
+      socket.on("del_struktura", async function (data) {
+        await struktura.deleteMany({ numer: data });
         log(`Deleted struktura *${data.numer}* on: **${socket.id}**`);
-        commit()
       });
 
       socket.on("add_polowanie", function (data) {
-        jsonString = {
+        const newPolowanie = new polowanie({
           numer: data.numer,
           data: data.data,
           teren: data.teren,
@@ -346,24 +431,26 @@ module.exports = (client) => {
           dystans: data.dystans,
           znalezione_struktury: data.znalezione_struktury,
           wynik: data.wynik,
-        };
+        });
 
-        fs.appendFileSync(
-          `${polowania_dir}${data.numer}.json`,
-          JSON.stringify(jsonString)
-        );
+        newPolowanie
+          .save()
+          .then()
+          .catch((err) => {
+            console.error(err);
+          });
 
         let wynik = "";
-        if (data.wynik == "1") {
+        if (data.wynik == 1) {
           wynik = "Kapitalny";
         }
-        if (data.wynik == "2") {
+        if (data.wynik == 2) {
           wynik = "Zadowalający";
         }
-        if (data.wynik == "3") {
+        if (data.wynik == 3) {
           wynik = "Słaby";
         }
-        if (data.wynik == "4") {
+        if (data.wynik == 4) {
           wynik = "Zły";
         }
 
@@ -431,36 +518,14 @@ module.exports = (client) => {
           client.channels.cache
             .get(`999410309108355214`)
             .send({ embeds: [embedVar] });
-          commit()
         }, 1000);
 
         log(`Added polowanie *${data.numer}* on: **${socket.id}**`);
       });
 
-      socket.on("del_polowanie", function (data) {
-        if (fs.existsSync(`${polowania_dir}${data}.json`) == false) return;
-        fs.unlinkSync(`${polowania_dir}${data}.json`);
+      socket.on("del_polowanie", async function (data) {
+        await polowanie.deleteMany({ numer: data });
         log(`Deleted polowanie *${data}* on: **${socket.id}**`);
-        commit()
-      });
-
-      socket.on("backup", async function () {
-        log(`Downloading backup on: **${socket.id}**`);
-
-        const AdmZip = require("adm-zip");
-
-        try {
-          const zip = new AdmZip();
-          const outputDir = "./backup.zip";
-          zip.addLocalFolder("./data/");
-          zip.writeZip(outputDir);
-        } catch (e) {
-          console.log(`Something went wrong ${e}`);
-        }
-
-        data = fs.readFileSync("./backup.zip", { encoding: "base64" }); //Send zip file in base64
-
-        socket.emit("backup_file", data);
       });
 
       setTimeout(() => {
@@ -474,78 +539,46 @@ module.exports = (client) => {
     if (socket.handshake.headers["subpage"] === "polowania") {
       log(`Socket **${socket.id}** connected on /polowania`);
 
-      async function send_polowanie(file) {
-        const content = await readFile(polowania_dir + file, "utf8");
-
-        if (!content) return;
-
-        const json = JSON.parse(content);
-
+      async function send_polowanie(element) {
         const data = {
-          numer: json.numer,
-          data: json.data,
-          teren: json.teren,
-          mysliwi: json.mysliwi,
-          budzet: json.budzet,
-          dystans: json.dystans,
-          znalezione_struktury: json.znalezione_struktury,
-          wynik: json.wynik,
+          numer: element.numer,
+          data: element.data,
+          teren: element.teren,
+          mysliwi: element.mysliwi,
+          budzet: element.budzet,
+          dystans: element.dystans,
+          znalezione_struktury: element.znalezione_struktury,
+          wynik: element.wynik,
         };
         socket.emit("polowanie", data);
       }
 
-      try {
-        const files = fs.readdirSync(polowania_dir);
-
-        files.forEach(async (file) => {
-          if (file.split(".").pop() === "json") {
-            await send_polowanie(file);
-          }
-        });
-      } catch (err) {
-        console.log(err);
-      }
+      polowanie.find().then(async (result) => {
+        for (let i = 0; i < result.length; i++) {
+          const element = result[i];
+          await send_polowanie(element);
+        }
+      });
     }
     if (socket.handshake.headers["subpage"] === "mapa") {
       log(`Socket **${socket.id}** connected on /mapa`);
 
-      try {
-        for (let i = 1; i < 4; i++) {
-          //For all files
-          const files = fs.readdirSync(`${struktury_dir}/${i}`);
-          files.forEach(async (file) => {
-            if (file.split(".").pop() === "json") {
-              await send(i, file);
-            }
-          });
-        }
-      } catch (err) {
-        console.log(err);
-      }
-
-      async function send(type, file) {
-        //Read one file
-        if ((await exists(struktury_dir + type + "/" + file)) == false) return;
-
-        const content = await readFile(
-          struktury_dir + type + "/" + file,
-          "utf8"
-        );
-
-        if (!content) return;
-
-        const json = JSON.parse(content);
-
+      async function send_struktura(element) {
         const data = {
-          numer: json.numer,
-          rodzaj: json.rodzaj,
-          polowanie: json.polowanie,
-          longitude: json.longitude,
-          latitude: json.latitude,
+          numer: element.numer,
+          rodzaj: element.rodzaj,
+          longitude: element.longitude,
+          latitude: element.latitude,
         };
-
         socket.emit("struktura", data);
       }
+
+      struktura.find().then(async (result) => {
+        for (let i = 0; i < result.length; i++) {
+          const element = result[i];
+          await send_struktura(element);
+        }
+      });
     }
   });
 

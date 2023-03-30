@@ -27,15 +27,6 @@ socket.on("Authenticated", (data) => {
   main.style.visibility = "visible";
   main.style.width = "100%";
   main.style.height = "100%";
-
-  var polowanie = document.getElementById("polowanie");
-
-  for (let i = 0; i < data.length; i++) {
-    numer = data[i].substring(0, data[i].indexOf("."));
-
-    let newOption = new Option(numer, numer);
-    polowanie.add(newOption, undefined);
-  }
 });
 
 var add_struktura_btn = document.getElementById("add_s_btn");

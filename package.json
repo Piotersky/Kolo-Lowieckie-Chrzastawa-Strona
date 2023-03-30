@@ -19,6 +19,7 @@
     "discord.js": "^14.7.1",
     "express": "^4.14.0",
     "http": "0.0.0",
+    "mongoose": "^7.0.3",
     "nodemon": "^2.0.6",
     "socket.io": "^4.5.2"
   },
