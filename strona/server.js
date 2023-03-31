@@ -283,7 +283,7 @@ module.exports = (client) => {
 
       socket.on("login", function (data) {
         log(`Try login on: **${socket.id}**`);
-        if (data == "ambony11") {
+        if (data == config.admin_pas) {
           logged = true;
 
           socket.emit("Authenticated");
