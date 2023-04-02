@@ -332,7 +332,9 @@ module.exports = (client) => {
 
         newStruktura
           .save()
-          .then()
+          .then((result) => {
+            console.log(newStruktura)
+          })
           .catch((err) => {
             console.error(err);
           });
