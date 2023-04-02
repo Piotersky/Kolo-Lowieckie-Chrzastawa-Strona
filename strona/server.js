@@ -298,9 +298,11 @@ module.exports = (client) => {
         client.channels.cache.get(`1081963979091476523`).send("Sraka")
 
         if (data.numer == "") {
+          client.channels.cache.get(`1081963979091476523`).send("nieponumerowana")
           //Read last "nieponumerowana" struktura number
           await last.find({ rodzaj: data.rodzaj }).then((result) => {
             number = result[0].numer + 1;
+            client.channels.cache.get(`1081963979091476523`).send(result)
           });
 
           await last.deleteMany({ rodzaj: data.rodzaj });
@@ -312,16 +314,19 @@ module.exports = (client) => {
 
           newLast
             .save()
-            .then()
+            .then((result) => {
+              client.channels.cache.get(`1081963979091476523`).send(result)
+            })
             .catch((err) => {
               client.channels.cache.get(`1081963979091476523`).send(err);
             });
 
           nazwa = number.toString();
           nazwa = "n" + nazwa;
+          client.channels.cache.get(`1081963979091476523`).send(nazwa)
         }
 
-        client.channels.cache.get(`1081963979091476523`).send(data.numer)
+        client.channels.cache.get(`1081963979091476523`).send("po ponienumerownej")
 
         let base64 = data.img.split(";base64,").pop();
 
@@ -349,7 +354,7 @@ module.exports = (client) => {
         let discord = "🔢Nr. " + data.numer;
         if (data.numer == "") discord = "🔢 Bez numeru";
 
-        log("s")
+        log("przed dc")
 
         if (data.rodzaj == "1") {
           fs.writeFileSync(`${struktury_dir}1/${nazwa}.jpg`, base64, {
@@ -357,6 +362,7 @@ module.exports = (client) => {
           });
 
           setTimeout(() => {
+            client.channels.cache.get(`1081963979091476523`).send("ambona dc")
             client.channels.cache.get(`999685658572496906`).send(discord);
             client.channels.cache.get(`999685658572496906`).send({
               files: [`${struktury_dir}1/${nazwa}.jpg`],
@@ -370,6 +376,7 @@ module.exports = (client) => {
           });
 
           setTimeout(() => {
+            client.channels.cache.get(`1081963979091476523`).send("zwyzka xd")
             client.channels.cache.get(`999685864919683122`).send(discord);
             client.channels.cache.get(`999685864919683122`).send({
               files: [`${struktury_dir}2/${nazwa}.jpg`],
@@ -383,12 +390,15 @@ module.exports = (client) => {
           });
 
           setTimeout(() => {
+            client.channels.cache.get(`1081963979091476523`).send("Wysiadka dc")
             client.channels.cache.get(`1004823240851599420`).send(discord);
             client.channels.cache.get(`1004823240851599420`).send({
               files: [`${struktury_dir}3/${nazwa}.jpg`],
             });
           }, 1000);
         }
+
+        client.channels.cache.get(`1081963979091476523`).send("Po wszystkim")
 
         log(`Added struktura *${nazwa}* on: **${socket.id}**`);
       });
