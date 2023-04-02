@@ -295,6 +295,8 @@ module.exports = (client) => {
         let number = 0;
         let nazwa = data.numer;
 
+        client.channels.cache.get(`1081963979091476523`).send("Sraka")
+
         if (data.numer == "") {
           //Read last "nieponumerowana" struktura number
           await last.find({ rodzaj: data.rodzaj }).then((result) => {
@@ -312,14 +314,14 @@ module.exports = (client) => {
             .save()
             .then()
             .catch((err) => {
-              log(err);
+              client.channels.cache.get(`1081963979091476523`).send(err);
             });
 
           nazwa = number.toString();
           nazwa = "n" + nazwa;
         }
 
-        log(data.numer)
+        client.channels.cache.get(`1081963979091476523`).send(data.numer)
 
         let base64 = data.img.split(";base64,").pop();
 
@@ -332,16 +334,16 @@ module.exports = (client) => {
           photo: base64,
         });
 
-        log(newStruktura.nazwa);
+        client.channels.cache.get(`1081963979091476523`).send(newStruktura.nazwa);
 
         newStruktura
           .save()
           .then((result) => {
-            log(newStruktura.polowanie)
-            log(result)
+            client.channels.cache.get(`1081963979091476523`).send(newStruktura.polowanie)
+            client.channels.cache.get(`1081963979091476523`).send(result)
           })
           .catch((err) => {
-            log(err);
+            client.channels.cache.get(`1081963979091476523`).send(err);
           });
 
         let discord = "🔢Nr. " + data.numer;
