@@ -67,8 +67,8 @@ module.exports = (client) => {
     // const readFile = promisify(fs.readFile);
     // const exists = promisify(fs.exists);
 
-    // const data_dir = "./data/";
-    // const struktury_dir = data_dir + "struktury/";
+    const data_dir = "./data/";
+    const struktury_dir = data_dir + "struktury/";
     // const polowania_dir = data_dir + "polowania/";
 
     if (socket.handshake.headers["subpage"] === "struktury") {
