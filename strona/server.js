@@ -319,6 +319,8 @@ module.exports = (client) => {
           nazwa = "n" + nazwa;
         }
 
+        console.log(data.numer)
+
         let base64 = data.img.split(";base64,").pop();
 
         const newStruktura = new struktura({
@@ -330,10 +332,13 @@ module.exports = (client) => {
           photo: base64,
         });
 
+        console.log(newStruktura.nazwa);
+
         newStruktura
           .save()
           .then((result) => {
-            console.log(newStruktura)
+            console.log(newStruktura.polowanie)
+            console.log(result)
           })
           .catch((err) => {
             console.error(err);
@@ -341,6 +346,8 @@ module.exports = (client) => {
 
         let discord = "🔢Nr. " + data.numer;
         if (data.numer == "") discord = "🔢 Bez numeru";
+
+        console.log("s")
 
         if (data.rodzaj == "1") {
           fs.writeFileSync(`${struktury_dir}1/${nazwa}.jpg`, base64, {
