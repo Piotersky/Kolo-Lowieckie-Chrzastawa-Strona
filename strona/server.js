@@ -312,14 +312,14 @@ module.exports = (client) => {
             .save()
             .then()
             .catch((err) => {
-              console.error(err);
+              log(err);
             });
 
           nazwa = number.toString();
           nazwa = "n" + nazwa;
         }
 
-        console.log(data.numer)
+        log(data.numer)
 
         let base64 = data.img.split(";base64,").pop();
 
@@ -332,22 +332,22 @@ module.exports = (client) => {
           photo: base64,
         });
 
-        console.log(newStruktura.nazwa);
+        log(newStruktura.nazwa);
 
         newStruktura
           .save()
           .then((result) => {
-            console.log(newStruktura.polowanie)
-            console.log(result)
+            log(newStruktura.polowanie)
+            log(result)
           })
           .catch((err) => {
-            console.error(err);
+            log(err);
           });
 
         let discord = "🔢Nr. " + data.numer;
         if (data.numer == "") discord = "🔢 Bez numeru";
 
-        console.log("s")
+        log("s")
 
         if (data.rodzaj == "1") {
           fs.writeFileSync(`${struktury_dir}1/${nazwa}.jpg`, base64, {
