@@ -64,8 +64,8 @@ const io = require('socket.io')(server, {
 
     log("Socket connected")
 
-    const readFile = promisify(fs.readFile);
-    const exists = promisify(fs.exists);
+    // const readFile = promisify(fs.readFile);
+    // const exists = promisify(fs.exists);
 
     const data_dir = "./data/";
     const struktury_dir = data_dir + "struktury/";
