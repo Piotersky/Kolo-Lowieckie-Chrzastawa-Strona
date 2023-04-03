@@ -1,7 +1,5 @@
 const express = require("express");
 var cors = require("cors");
-const { Server } = require("socket.io");
-const http = require("http");
 const { EmbedBuilder } = require("discord.js");
 const fs = require("fs");
 // const path = require("path");
@@ -15,10 +13,10 @@ const last = require("./last_schema.js");
 module.exports = (client) => {
   //Initialize
   const app = express();
-  const server = http.createServer(app);
-  const io = new Server(server, {
-    maxHttpBufferSize: 1e8,
-  });
+  const server = require('http').Server(app);
+const io = require('socket.io')(server, {
+  maxHttpBufferSize: 10e8 // 10 MB
+});
 
   app.options(
     "*",
@@ -57,12 +55,14 @@ module.exports = (client) => {
   //   .then((result) => console.log("Connected to MongoDB"))
   //   .catch((err) => console.log(err));
 
-  // io.on("connection", function (socket) {
+  io.on("connection", function (socket) {
 
-  //   function log(text) {
-  //     console.log(text);
-  //     client.channels.cache.get(`1081963979091476523`).send(text);
-  //   }
+    // function log(text) {
+    //   console.log(text);
+    //   client.channels.cache.get(`1081963979091476523`).send(text);
+    // }
+
+    console.log("Socket connected")
 
   //   // const readFile = promisify(fs.readFile);
   //   // const exists = promisify(fs.exists);
@@ -555,7 +555,7 @@ module.exports = (client) => {
   //       }
   //     });
   //   }
-  // });
+  });
 
   const port = process.env.PORT;
 
