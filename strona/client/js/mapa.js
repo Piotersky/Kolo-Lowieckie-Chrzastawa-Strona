@@ -3,13 +3,11 @@ window.onload = function () {
     fullscreenControl: true,
   }).setView([51.008923, 17.347519], 11);
 
-  var socket = io.connect("https://klchrzastawa.onrender.com/mapa", {
-   forceNew: true,
-   transports: ["polling"],
-   extraHeaders: {
-    subpage: "mapa",
-  },
-});
+  var socket = io({
+    extraHeaders: {
+      subpage: "mapa",
+    },
+  });
 
   const tiles = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
     maxZoom: 19,

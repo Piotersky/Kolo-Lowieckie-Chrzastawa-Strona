@@ -1,7 +1,5 @@
-var socket = io.connect("https://klchrzastawa.onrender.com/polowania", {
-   forceNew: true,
-   transports: ["polling"],
-   extraHeaders: {
+var socket = io({
+  extraHeaders: {
     subpage: "polowania",
   },
 });
