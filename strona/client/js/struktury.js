@@ -1,5 +1,7 @@
-var socket = io({
-  extraHeaders: {
+var socket = io.connect("https://klchrzastawa.onrender.com/struktury", {
+   forceNew: true,
+   transports: ["polling"],
+   extraHeaders: {
     subpage: "struktury",
   },
 });

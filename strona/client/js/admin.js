@@ -1,8 +1,10 @@
 var login_btn = document.getElementById("login_btn");
 logged = false;
 
-var socket = io.connect({
-  extraHeaders: {
+var socket = io.connect("https://klchrzastawa.onrender.com/admin", {
+   forceNew: true,
+   transports: ["polling"],
+   extraHeaders: {
     subpage: "admin",
   },
 });
