@@ -48,31 +48,31 @@ const io = require('socket.io')(server, {
 
   //MongoDB
 
-  // const uri = `mongodb+srv://${config.username}:${config.password}@cluster0.8kcmsxz.mongodb.net/data?retryWrites=true&w=majority`;
+  const uri = `mongodb+srv://${config.username}:${config.password}@cluster0.8kcmsxz.mongodb.net/data?retryWrites=true&w=majority`;
 
-  // mongoose
-  //   .connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
-  //   .then((result) => console.log("Connected to MongoDB"))
-  //   .catch((err) => console.log(err));
+  mongoose
+    .connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
+    .then((result) => console.log("Connected to MongoDB"))
+    .catch((err) => console.log(err));
 
   io.on("connection", function (socket) {
 
-    // function log(text) {
-    //   console.log(text);
-    //   client.channels.cache.get(`1081963979091476523`).send(text);
-    // }
+    function log(text) {
+      console.log(text);
+      client.channels.cache.get(`1081963979091476523`).send(text);
+    }
 
-    console.log("Socket connected")
+    log("Socket connected")
 
-  //   // const readFile = promisify(fs.readFile);
-  //   // const exists = promisify(fs.exists);
+    const readFile = promisify(fs.readFile);
+    const exists = promisify(fs.exists);
 
-  //   const data_dir = "./data/";
-  //   const struktury_dir = data_dir + "struktury/";
+    const data_dir = "./data/";
+    const struktury_dir = data_dir + "struktury/";
   //   // const polowania_dir = data_dir + "polowania/";
 
-  //   if (socket.handshake.headers["subpage"] === "struktury") {
-  //     log(`Socket **${socket.id}** connected on /struktury`);
+    if (socket.handshake.headers["subpage"] === "struktury") {
+      log(`Socket **${socket.id}** connected on /struktury`);
 
   //     // async function getBuffer(filePath) {
   //     //   //Get img buffer
@@ -274,10 +274,10 @@ const io = require('socket.io')(server, {
   //       //   });
   //       // }
   //     });
-  //   }
+    }
 
-  //   if (socket.handshake.headers["subpage"] === "admin") {
-  //     log(`Socket **${socket.id}** connected on /admin`);
+    if (socket.handshake.headers["subpage"] === "admin") {
+      log(`Socket **${socket.id}** connected on /admin`);
 
   //     logged = false;
 
@@ -509,10 +509,10 @@ const io = require('socket.io')(server, {
   //         socket.client._remove(socket.id);
   //       }
   //     }, 30 * 1000);
-  //   }
+    }
 
-  //   if (socket.handshake.headers["subpage"] === "polowania") {
-  //     log(`Socket **${socket.id}** connected on /polowania`);
+    if (socket.handshake.headers["subpage"] === "polowania") {
+      log(`Socket **${socket.id}** connected on /polowania`);
 
   //     async function send_polowanie(element) {
   //       const data = {
@@ -534,9 +534,9 @@ const io = require('socket.io')(server, {
   //         await send_polowanie(element);
   //       }
   //     });
-  //   }
-  //   if (socket.handshake.headers["subpage"] === "mapa") {
-  //     log(`Socket **${socket.id}** connected on /mapa`);
+    }
+    if (socket.handshake.headers["subpage"] === "mapa") {
+      log(`Socket **${socket.id}** connected on /mapa`);
 
   //     async function send_struktura(element) {
   //       const data = {
@@ -554,7 +554,7 @@ const io = require('socket.io')(server, {
   //         await send_struktura(element);
   //       }
   //     });
-  //   }
+    }
   });
 
   const port = process.env.PORT;
