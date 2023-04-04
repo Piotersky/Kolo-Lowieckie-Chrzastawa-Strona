@@ -5,9 +5,9 @@ const { EmbedBuilder } = require("discord.js");
 // const { promisify } = require("util");
 const mongoose = require("mongoose");
 const config = require("../bot/config.js");
-// const polowanie = require("./polowanie_schema.js");
-// const struktura = require("./struktura_schema.js");
-// const last = require("./last_schema.js");
+const polowanie = require("./polowanie_schema.js");
+const struktura = require("./struktura_schema.js");
+const last = require("./last_schema.js");
 
 module.exports = (client) => {
   //Initialize
@@ -534,22 +534,22 @@ module.exports = (client) => {
     if (socket.handshake.headers["subpage"] === "mapa") {
       log(`Socket **${socket.id}** connected on /mapa`);
 
-      //     async function send_struktura(element) {
-      //       const data = {
-      //         numer: element.numer,
-      //         rodzaj: element.rodzaj,
-      //         longitude: element.longitude,
-      //         latitude: element.latitude,
-      //       };
-      //       socket.emit("struktura", data);
-      //     }
+          async function send_struktura(element) {
+            const data = {
+              numer: element.numer,
+              rodzaj: element.rodzaj,
+              longitude: element.longitude,
+              latitude: element.latitude,
+            };
+            socket.emit("struktura", data);
+          }
 
-      //     struktura.find().then(async (result) => {
-      //       for (let i = 0; i < result.length; i++) {
-      //         const element = result[i];
-      //         await send_struktura(element);
-      //       }
-      //     });
+          struktura.find().then(async (result) => {
+            for (let i = 0; i < result.length; i++) {
+              const element = result[i];
+              await send_struktura(element);
+            }
+          });
     }
   });
 
