@@ -510,26 +510,26 @@ module.exports = (client) => {
     if (socket.handshake.headers["subpage"] === "polowania") {
       log(`Socket **${socket.id}** connected on /polowania`);
 
-      //     async function send_polowanie(element) {
-      //       const data = {
-      //         numer: element.numer,
-      //         data: element.data,
-      //         teren: element.teren,
-      //         mysliwi: element.mysliwi,
-      //         budzet: element.budzet,
-      //         dystans: element.dystans,
-      //         znalezione_struktury: element.znalezione_struktury,
-      //         wynik: element.wynik,
-      //       };
-      //       socket.emit("polowanie", data);
-      //     }
+          async function send_polowanie(element) {
+            const data = {
+              numer: element.numer,
+              data: element.data,
+              teren: element.teren,
+              mysliwi: element.mysliwi,
+              budzet: element.budzet,
+              dystans: element.dystans,
+              znalezione_struktury: element.znalezione_struktury,
+              wynik: element.wynik,
+            };
+            socket.emit("polowanie", data);
+          }
 
-      //     polowanie.find().then(async (result) => {
-      //       for (let i = 0; i < result.length; i++) {
-      //         const element = result[i];
-      //         await send_polowanie(element);
-      //       }
-      //     });
+          polowanie.find().then(async (result) => {
+            for (let i = 0; i < result.length; i++) {
+              const element = result[i];
+              await send_polowanie(element);
+            }
+          });
     }
     if (socket.handshake.headers["subpage"] === "mapa") {
       log(`Socket **${socket.id}** connected on /mapa`);
