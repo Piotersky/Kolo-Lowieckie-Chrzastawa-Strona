@@ -334,10 +334,7 @@ const io = new Server(httpServer, {
 
             newStruktura
               .save()
-              .then((result) => {
-                console.log(newStruktura.polowanie)
-                console.log(result)
-              })
+              .then()
               .catch((err) => {
                 console.error(err);
               });
@@ -347,6 +344,7 @@ const io = new Server(httpServer, {
 
             console.log(struktury_dir)
             console.log(`${struktury_dir}1/${nazwa}.jpg`)
+            console.log(fs.readdirSync(`${struktury_dir}1/`))
 
             setTimeout(() => {
 
