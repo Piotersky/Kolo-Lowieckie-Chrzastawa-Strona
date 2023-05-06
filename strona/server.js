@@ -342,22 +342,18 @@ const io = new Server(httpServer, {
             let discord = "🔢Nr. " + data.numer;
             if (data.numer == "") discord = "🔢 Bez numeru";
 
-            fs.mkdirSync('./data')
-
-            fs.mkdirSync('./data/1');
-            fs.mkdirSync('./data/2');
-            fs.mkdirSync('./data/3');
-            console.log(fs.readdirSync('./data/'))
+            fs.mkdirSync('./data');
+            fs.mkdirSync('./data/struktury');
+            fs.mkdirSync('./data/struktury/1');
+            fs.mkdirSync('./data/struktury/2');
+            fs.mkdirSync('./data/struktury/3');
 
             setTimeout(() => {
 
             if (data.rodzaj == "1") {
-              console.log("s")
               fs.writeFileSync(`${struktury_dir}1/${nazwa}.jpg`, base64, {
                 encoding: "base64",
               });
-
-              console.log("S")
 
               setTimeout(() => {
                 console.log(fs.readdirSync(`${struktury_dir}1/`))
