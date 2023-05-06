@@ -1,4 +1,3 @@
-const express = require("express");
 const { EmbedBuilder } = require("discord.js");
 const fs = require("fs");
 // const path = require("path");
@@ -11,9 +10,9 @@ const last = require("./last_schema.js");
 
 module.exports = (client) => {
   //Initialize
-  const app = express();
-  const server = require("http").Server(app);
-  const io = require("socket.io")(server, {
+  const app = require("express")();
+  const http = require("http").Server(app);
+  var io = require('socket.io')(http, {
     maxHttpBufferSize: 10e8, // 10 MB
   });
 
@@ -553,9 +552,9 @@ module.exports = (client) => {
     }
   });
 
-  const port = 10000;
+  http.listen(10000, function(){
 
-  server.listen(port, () => {
-    console.log(`Listening on port ${port}`);
+    console.log('Listnening on port 10000');
+  
   });
 };
