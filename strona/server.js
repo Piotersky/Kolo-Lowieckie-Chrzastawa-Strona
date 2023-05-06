@@ -348,12 +348,18 @@ const io = new Server(httpServer, {
             console.log(struktury_dir)
             console.log(`${struktury_dir}1/${nazwa}.jpg`)
 
+            setTimeout(() => {
+
             if (data.rodzaj == "1") {
+              console.log("s")
               fs.writeFileSync(`${struktury_dir}1/${nazwa}.jpg`, base64, {
                 encoding: "base64",
               });
 
+              console.log("S")
+
               setTimeout(() => {
+                console.log(fs.readdirSync(`${struktury_dir}1/`))
                 client.channels.cache.get(`999685658572496906`).send(discord);
                 client.channels.cache.get(`999685658572496906`).send({
                   files: [`${struktury_dir}1/${nazwa}.jpg`],
@@ -386,7 +392,7 @@ const io = new Server(httpServer, {
                 });
               }, 1000);
             }
-
+            }, 1000);
             log(`Added struktura *${nazwa}* on: **${socket.id}**`);
           });
 
