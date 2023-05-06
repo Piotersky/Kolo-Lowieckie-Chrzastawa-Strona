@@ -342,10 +342,8 @@ const io = new Server(httpServer, {
             let discord = "🔢Nr. " + data.numer;
             if (data.numer == "") discord = "🔢 Bez numeru";
 
-            console.log(struktury_dir)
-            console.log(`${struktury_dir}1/${nazwa}.jpg`)
-            fs.writeFileSync("s.txt", "s", {encoding: "utf-8"})
-            console.log(fs.readdirSync(`./`))
+            fs.writeFileSync("./data/s.txt", "s", {encoding: "utf-8"})
+            console.log(fs.readdirSync(`./data/`))
 
             setTimeout(() => {
 
