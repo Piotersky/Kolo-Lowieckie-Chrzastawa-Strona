@@ -1,3 +1,6 @@
+const express = require("express");
+const { createServer } = require("http");
+const { Server } = require("socket.io");
 const { EmbedBuilder } = require("discord.js");
 const fs = require("fs");
 // const path = require("path");
@@ -10,18 +13,13 @@ const last = require("./last_schema.js");
 
 module.exports = (client) => {
   //Initialize
-  const app = require("express")();
-  const http = require("http").Server(app);
-  var io = require('socket.io')(http, {
-    maxHttpBufferSize: 10e8, // 10 MB
-  });
+  
 
-  app.options(
-    "*",
-    
-  );
+let app = express();
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-  app.use("/client", app.static(__dirname + "/client"));
+  app.use("/client", express.static(__dirname + "/client"));
 
   app.get("/", function (req, res) {
     res.sendFile(__dirname + "/client/index.html");
@@ -41,6 +39,15 @@ module.exports = (client) => {
   app.get("/mapa", (req, res) => {
     res.sendFile(__dirname + "/client/mapa.html");
   });
+
+  const httpServer = createServer(app);
+const io = new Server(httpServer, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"],
+  },
+  maxHttpBufferSize: 10e8,
+});
 
   //MongoDB
 
@@ -552,9 +559,9 @@ module.exports = (client) => {
     }
   });
 
-  http.listen(10000, function(){
+  const port = 10000;
 
-    console.log('Listnening on port 10000');
-  
+  httpServer.listen(port, () => {
+    console.log(`Example app listening on port ${port}`);
   });
 };
