@@ -1,7 +1,7 @@
 var login_btn = document.getElementById("login_btn");
 logged = false;
 
-var socket = io.connect({
+var socket = io({
   extraHeaders: {
     subpage: "admin",
   },
