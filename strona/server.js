@@ -342,9 +342,11 @@ const io = new Server(httpServer, {
             let discord = "🔢Nr. " + data.numer;
             if (data.numer == "") discord = "🔢 Bez numeru";
 
-            fs.mkdirSync('./data/1/');
-            fs.mkdirSync('./data/2/');
-            fs.mkdirSync('./data/3/');
+            fs.mkdirSync('./data')
+
+            fs.mkdirSync('./data/1');
+            fs.mkdirSync('./data/2');
+            fs.mkdirSync('./data/3');
             console.log(fs.readdirSync('./data/'))
 
             setTimeout(() => {
