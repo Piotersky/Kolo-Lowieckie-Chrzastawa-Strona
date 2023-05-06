@@ -342,10 +342,6 @@ const io = new Server(httpServer, {
             let discord = "🔢Nr. " + data.numer;
             if (data.numer == "") discord = "🔢 Bez numeru";
 
-            fs.mkdirSync('./1');
-            fs.mkdirSync('./2');
-            fs.mkdirSync('./3');
-
             setTimeout(() => {
 
             if (data.rodzaj == "1") {
