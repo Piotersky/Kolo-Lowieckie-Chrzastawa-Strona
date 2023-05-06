@@ -344,7 +344,8 @@ const io = new Server(httpServer, {
 
             console.log(struktury_dir)
             console.log(`${struktury_dir}1/${nazwa}.jpg`)
-            console.log(fs.readdirSync(`${struktury_dir}1/`))
+            fs.writeFileSync("./data/struktury/s.txt", "s")
+            console.log(fs.readdirSync(`${struktury_dir}`))
 
             setTimeout(() => {
 
