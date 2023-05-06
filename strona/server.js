@@ -1,6 +1,6 @@
 const express = require("express");
 const { EmbedBuilder } = require("discord.js");
-// const fs = require("fs");
+const fs = require("fs");
 // const path = require("path");
 // const { promisify } = require("util");
 const mongoose = require("mongoose");
