@@ -321,8 +321,6 @@ const io = new Server(httpServer, {
               nazwa = "n" + nazwa;
             }
 
-            console.log(data.numer)
-
             let base64 = data.img.split(";base64,").pop();
 
             const newStruktura = new struktura({
@@ -333,8 +331,6 @@ const io = new Server(httpServer, {
               polowanie: data.polowanie,
               photo: base64,
             });
-
-            console.log(newStruktura.nazwa);
 
             newStruktura
               .save()
@@ -349,7 +345,8 @@ const io = new Server(httpServer, {
             let discord = "🔢Nr. " + data.numer;
             if (data.numer == "") discord = "🔢 Bez numeru";
 
-            console.log("s")
+            console.log(struktury_dir)
+            console.log(`${struktury_dir}1/${nazwa}.jpg`)
 
             if (data.rodzaj == "1") {
               fs.writeFileSync(`${struktury_dir}1/${nazwa}.jpg`, base64, {
@@ -562,6 +559,6 @@ const io = new Server(httpServer, {
   const port = 10000;
 
   httpServer.listen(port, () => {
-    console.log(`Example app listening on port ${port}`);
-  });
+  console.log(`Example app listening on port ${port}`);
+});
 };
