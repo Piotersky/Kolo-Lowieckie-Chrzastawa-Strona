@@ -342,50 +342,48 @@ const io = new Server(httpServer, {
             let discord = "🔢Nr. " + data.numer;
             if (data.numer == "") discord = "🔢 Bez numeru";
 
-            fs.mkdirSync('./data');
-            fs.mkdirSync('./data/struktury');
-            fs.mkdirSync('./data/struktury/1');
-            fs.mkdirSync('./data/struktury/2');
-            fs.mkdirSync('./data/struktury/3');
+            fs.mkdirSync('./1');
+            fs.mkdirSync('./2');
+            fs.mkdirSync('./3');
 
             setTimeout(() => {
 
             if (data.rodzaj == "1") {
-              fs.writeFileSync(`${struktury_dir}1/${nazwa}.jpg`, base64, {
+              fs.writeFileSync(`./1/${nazwa}.jpg`, base64, {
                 encoding: "base64",
               });
 
               setTimeout(() => {
-                console.log(fs.readdirSync(`${struktury_dir}1/`))
+                console.log(fs.readdirSync(`./1/`))
                 client.channels.cache.get(`999685658572496906`).send(discord);
                 client.channels.cache.get(`999685658572496906`).send({
-                  files: [`${struktury_dir}1/${nazwa}.jpg`],
+                  files: [`./1/${nazwa}.jpg`],
                 });
               }, 1000);
             }
 
             if (data.rodzaj == "2") {
-              fs.writeFileSync(`${struktury_dir}2/${nazwa}.jpg`, base64, {
+              fs.writeFileSync(`./2/${nazwa}.jpg`, base64, {
                 encoding: "base64",
               });
 
               setTimeout(() => {
                 client.channels.cache.get(`999685864919683122`).send(discord);
                 client.channels.cache.get(`999685864919683122`).send({
-                  files: [`${struktury_dir}2/${nazwa}.jpg`],
+                  files: [`./2/${nazwa}.jpg`],
                 });
               }, 1000);
             }
 
             if (data.rodzaj == "3") {
-              fs.writeFileSync(`${struktury_dir}3/${nazwa}.jpg`, base64, {
+              fs.writeFileSync(`./3/${nazwa}.jpg`, base64, {
                 encoding: "base64",
               });
 
               setTimeout(() => {
                 client.channels.cache.get(`1004823240851599420`).send(discord);
                 client.channels.cache.get(`1004823240851599420`).send({
-                  files: [`${struktury_dir}3/${nazwa}.jpg`],
+                  files: [`./3/${nazwa}.jpg`],
                 });
               }, 1000);
             }
