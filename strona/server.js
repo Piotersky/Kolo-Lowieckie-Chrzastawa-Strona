@@ -336,41 +336,40 @@ module.exports = (client) => {
 
         setTimeout(() => {
           if (data.rodzaj == "1") {
-            fs.writeFileSync(`./1/${nazwa}.jpg`, base64, {
+            fs.writeFileSync(`1/${nazwa}.jpg`, base64, {
               encoding: "base64",
             });
 
             setTimeout(() => {
-              console.log(fs.readdirSync(`./1/${nazwa}.jpg`));
               client.channels.cache.get(`999685658572496906`).send(discord);
               client.channels.cache.get(`999685658572496906`).send({
-                files: [`./1/${nazwa}.jpg`],
+                files: [`1/${nazwa}.jpg`],
               });
             }, 1000);
           }
 
           if (data.rodzaj == "2") {
-            fs.writeFileSync(`./2/${nazwa}.jpg`, base64, {
+            fs.writeFileSync(`2/${nazwa}.jpg`, base64, {
               encoding: "base64",
             });
 
             setTimeout(() => {
               client.channels.cache.get(`999685864919683122`).send(discord);
               client.channels.cache.get(`999685864919683122`).send({
-                files: [`./2/${nazwa}.jpg`],
+                files: [`2/${nazwa}.jpg`],
               });
             }, 1000);
           }
 
           if (data.rodzaj == "3") {
-            fs.writeFileSync(`./3/${nazwa}.jpg`, base64, {
+            fs.writeFileSync(`3/${nazwa}.jpg`, base64, {
               encoding: "base64",
             });
 
             setTimeout(() => {
               client.channels.cache.get(`1004823240851599420`).send(discord);
               client.channels.cache.get(`1004823240851599420`).send({
-                files: [`./3/${nazwa}.jpg`],
+                files: [`3/${nazwa}.jpg`],
               });
             }, 1000);
           }
