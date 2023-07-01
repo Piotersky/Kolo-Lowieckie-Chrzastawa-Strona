@@ -382,7 +382,7 @@ module.exports = (client) => {
       });
 
       socket.on("del_struktura", async function (data) {
-        await struktura.deleteMany({ numer: data });
+        await struktura.deleteMany({ numer: data.numer, rodzaj: data.rodzaj });
         log(`Deleted struktura *${data.numer}* on: **${socket.id}**`);
       });
 
