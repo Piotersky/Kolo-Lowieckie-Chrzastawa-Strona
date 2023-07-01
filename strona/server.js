@@ -337,11 +337,13 @@ module.exports = (client) => {
         setTimeout(() => {
           if (data.rodzaj == "1") {
             console.log(nazwa);
-            console.log(fs.readFileSync(`1/s.png`));
+            fs.mkdirSync("1");
+
+            // console.log(fs.readFileSync(`1/s.png`));
             fs.writeFileSync(`1/${nazwa}.jpg`, base64, {
               encoding: "base64",
             });
-
+            
             
 
             setTimeout(() => {
