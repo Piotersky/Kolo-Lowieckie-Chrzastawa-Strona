@@ -43,7 +43,7 @@ module.exports = (client) => {
       origin: "*",
       methods: ["GET", "POST"],
     },
-    maxHttpBufferSize: 10e8,
+    maxHttpBufferSize: 10e9,
   });
 
   //MongoDB
