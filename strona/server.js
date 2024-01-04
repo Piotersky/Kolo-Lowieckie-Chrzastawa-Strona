@@ -55,10 +55,6 @@ module.exports = (client) => {
     .then((result) => console.log("Connected to MongoDB"))
     .catch((err) => console.log(err));
 
-    fs.mkdirSync("1");
-    fs.mkdirSync("2");
-    fs.mkdirSync("3");
-
   io.on("connection", function (socket) {
     function log(text) {
       console.log(text);
