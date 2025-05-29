@@ -1,13 +1,13 @@
+var socket = io({
+  extraHeaders: {
+    subpage: "mapa",
+  },
+});
+
 window.onload = function () {
   let map = L.map("map", {
     fullscreenControl: true,
   }).setView([51.008923, 17.347519], 11);
-
-  var socket = io({
-    extraHeaders: {
-      subpage: "mapa",
-    },
-  });
 
   const tiles = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
     maxZoom: 19,

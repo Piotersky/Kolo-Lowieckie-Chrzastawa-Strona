@@ -48,7 +48,7 @@ module.exports = (client) => {
 
   //MongoDB
 
-  const uri = `mongodb+srv://${config.username}:${config.password}@cluster0.8kcmsxz.mongodb.net/data?retryWrites=true&w=majority`;
+  const uri = "mongodb+srv://admin:VsKpdTHzeJbh2XYE@cluster0.8kcmsxz.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
   mongoose
     .connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
@@ -61,7 +61,8 @@ module.exports = (client) => {
       client.channels.cache.get(`1081963979091476523`).send(text);
     }
 
-    log("Socket connected");
+    log("Socket connected");//ss
+
 
     const data_dir = "./data/";
     const struktury_dir = data_dir + "struktury/";
