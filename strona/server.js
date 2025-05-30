@@ -5,9 +5,9 @@ const { EmbedBuilder } = require("discord.js");
 const fs = require("fs");
 const mongoose = require("mongoose");
 const config = require("./config.js");
-const polowanie = require("./polowanie_schema.js");
-const struktura = require("./struktura_schema.js");
-const last = require("./last_schema.js");
+const polowanie = require("./schemas/polowanie_schema.js");
+const struktura = require("./schemas/struktura_schema.js");
+const last = require("./schemas/last_schema.js");
 const sharp = require("sharp");
 
 module.exports = (client) => {
