@@ -4,10 +4,11 @@ const { Server } = require("socket.io");
 const { EmbedBuilder } = require("discord.js");
 const fs = require("fs");
 const mongoose = require("mongoose");
-const config = require("../bot/config.js");
+const config = require("../config.js");
 const polowanie = require("./polowanie_schema.js");
 const struktura = require("./struktura_schema.js");
 const last = require("./last_schema.js");
+const sharp = require("sharp");
 
 module.exports = (client) => {
   //Initialize
@@ -21,6 +22,7 @@ module.exports = (client) => {
   app.get("/", function (req, res) {
     res.sendFile(__dirname + "/client/index.html");
   });
+  app.use("/data", express.static(__dirname + "/data")); // Dodaj folder z plikiem GeoJSON
   app.get("/struktury", (req, res) => {
     res.sendFile(__dirname + "/client/struktury.html");
   });
@@ -48,7 +50,7 @@ module.exports = (client) => {
 
   //MongoDB
 
-  const uri = "mongodb+srv://admin:VsKpdTHzeJbh2XYE@cluster0.8kcmsxz.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+  const uri = config.uri;
 
   mongoose
     .connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
@@ -61,94 +63,46 @@ module.exports = (client) => {
       client.channels.cache.get(`1081963979091476523`).send(text);
     }
 
-    log("Socket connected");//ss
+    log("Socket connected");
 
 
     const data_dir = "./data/";
-    const struktury_dir = data_dir + "struktury/";
+
+    async function send(element) {
+      console.log(`Sending struktura: ${element.numer}`); // Debug log
+      const data = {
+        numer: element.numer,
+        rodzaj: element.rodzaj,
+        polowanie: element.polowanie,
+        longitude: element.longitude,
+        latitude: element.latitude,
+        buffer: element.photo,
+      };
+      socket.emit("struktura", data);
+    }
+
+    async function all() {
+      console.log("Sending all structures");
+    
+      try {
+        // Fetch distinct numer values
+        const distinctNumerValues = await struktura.distinct("numer");
+    
+        for (const numer of distinctNumerValues) {
+          const element = await struktura.findOne({ numer }); // Fetch the full document
+          if (element) {
+            send(element); // Send the unique document to the client
+          }
+        }
+    
+        console.log("Finished sending all unique structures");
+      } catch (err) {
+        console.error("Error fetching unique structures:", err);
+      }
+    }
 
     if (socket.handshake.headers["subpage"] === "struktury") {
       log(`Socket **${socket.id}** connected on /struktury`);
-
-      // async function getBuffer(filePath) {
-      //   //Get img buffer
-      //   const isFile = await exists(filePath);
-      //   if (!isFile) return "";
-      //   return readFile(filePath);
-      // }
-
-      // async function send(type, file, fun) {
-      //   //Read one file and do function that is an argument
-      //   if ((await exists(struktury_dir + type + "/" + file)) == false) return;
-
-      //   const content = await readFile(
-      //     struktury_dir + type + "/" + file,
-      //     "utf8"
-      //   );
-
-      //   if (!content) return;
-
-      //   const json = JSON.parse(content);
-      //   const img_path = struktury_dir + +type + "/" + path.parse(file).name;
-
-      //   const buf = await getBuffer(`${img_path}.jpg`);
-
-      //   const data = {
-      //     numer: json.numer,
-      //     buffer: buf.toString("base64"),
-      //     rodzaj: json.rodzaj,
-      //     longitude: json.longitude,
-      //     latitude: json.latitude,
-      //     polowanie: json.polowanie,
-      //   };
-
-      //   fun(data);
-      // }
-
-      // async function files(type, fun) {
-      //   //For files in specific folder
-      //   try {
-      //     const files = fs.readdirSync(`${struktury_dir}${type}/`);
-
-      //     files.forEach(async (file) => {
-      //       if (file.split(".").pop() === "json") {
-      //         await fun(file);
-      //       }
-      //     });
-      //   } catch (err) {
-      //     console.log(err);
-      //   }
-      // }
-
-      // for (let i = 1; i < 4; i++) {
-      //   //For all files
-      //   files(i, function (file) {
-      //     send(i, file, function (data) {
-      //       socket.emit("struktura", data);
-      //     });
-      //   });
-      // }
-
-      async function send(element) {
-        const data = {
-          numer: element.numer,
-          rodzaj: element.rodzaj,
-          polowanie: element.polowanie,
-          longitude: element.longitude,
-          latitude: element.latitude,
-          buffer: element.photo,
-        };
-        socket.emit("struktura", data);
-      }
-
-      function all() {
-        struktura.find().then(async (result) => {
-          for (let i = 0; i < result.length; i++) {
-            const element = result[i];
-            await send(element);
-          }
-        });
-      }
 
       all();
 
@@ -314,7 +268,18 @@ module.exports = (client) => {
           nazwa = "n" + nazwa;
         }
 
-        let base64 = data.img.split(";base64,").pop();
+        async function compressImage(base64Image) {
+          const buffer = Buffer.from(base64Image, "base64");
+          const compressedBuffer = await sharp(buffer)
+            .resize({ width: 270, height: 370 }) // Resize to reduce dimensions
+            .jpeg({ quality: 80 }) // Compress to reduce quality
+            .toBuffer();
+          return compressedBuffer.toString("base64");
+        }
+
+        raw_data = data.img.split(";base64,").pop();
+
+        const compressedPhoto = await compressImage(raw_data);
 
         const newStruktura = new struktura({
           numer: nazwa,
@@ -322,7 +287,7 @@ module.exports = (client) => {
           longitude: data.longitude,
           latitude: data.latitude,
           polowanie: data.polowanie,
-          photo: base64,
+          photo: compressedPhoto,
         });
 
         newStruktura
@@ -334,47 +299,50 @@ module.exports = (client) => {
 
         let discord = "🔢Nr. " + data.numer;
         if (data.numer == "") discord = "🔢 Bez numeru";
+        console.log(data.dc_ann);
 
-        setTimeout(() => {
-          if (data.rodzaj == "1") {
-            fs.writeFileSync(`1/${nazwa}.jpg`, base64, {
-              encoding: "base64",
-            });
-
-            setTimeout(() => {
-              client.channels.cache.get(`999685658572496906`).send(discord);
-              client.channels.cache.get(`999685658572496906`).send({
-                files: [`1/${nazwa}.jpg`],
+        if(data.dc_ann == "true") {
+          setTimeout(() => {
+            if (data.rodzaj == "1") {
+              fs.writeFileSync(`temp.jpg`, raw_data, {
+                encoding: "base64",
               });
-            }, 1000);
-          }
 
-          if (data.rodzaj == "2") {
-            fs.writeFileSync(`2/${nazwa}.jpg`, base64, {
-              encoding: "base64",
-            });
+              setTimeout(() => {
+                client.channels.cache.get(`999685658572496906`).send(discord);
+                client.channels.cache.get(`999685658572496906`).send({
+                  files: [`temp.jpg`],
+                });
+              }, 1000);
+            }
 
-            setTimeout(() => {
-              client.channels.cache.get(`999685864919683122`).send(discord);
-              client.channels.cache.get(`999685864919683122`).send({
-                files: [`2/${nazwa}.jpg`],
+            if (data.rodzaj == "2") {
+              fs.writeFileSync(`temp.jpg`, raw_data, {
+                encoding: "base64",
               });
-            }, 1000);
-          }
 
-          if (data.rodzaj == "3") {
-            fs.writeFileSync(`3/${nazwa}.jpg`, base64, {
-              encoding: "base64",
-            });
+              setTimeout(() => {
+                client.channels.cache.get(`999685864919683122`).send(discord);
+                client.channels.cache.get(`999685864919683122`).send({
+                  files: [`temp.jpg`],
+                });
+              }, 1000);
+            }
 
-            setTimeout(() => {
-              client.channels.cache.get(`1004823240851599420`).send(discord);
-              client.channels.cache.get(`1004823240851599420`).send({
-                files: [`3/${nazwa}.jpg`],
+            if (data.rodzaj == "3") {
+              fs.writeFileSync(`temp.jpg`, raw_data, {
+                encoding: "base64",
               });
-            }, 1000);
-          }
-        }, 1000);
+
+              setTimeout(() => {
+                client.channels.cache.get(`1004823240851599420`).send(discord);
+                client.channels.cache.get(`1004823240851599420`).send({
+                  files: [`temp.jpg`],
+                });
+              }, 1000);
+            }
+          }, 1000);
+        }
         log(`Added struktura *${nazwa}* on: **${socket.id}**`);
       });
 
@@ -525,22 +493,54 @@ module.exports = (client) => {
     if (socket.handshake.headers["subpage"] === "mapa") {
       log(`Socket **${socket.id}** connected on /mapa`);
 
-      async function send_struktura(element) {
+      // async function send_struktura(element) {
+      //   const data = {
+      //     numer: element.numer,
+      //     rodzaj: element.rodzaj,
+      //     longitude: element.longitude,
+      //     latitude: element.latitude,
+      //   };
+      //   socket.emit("struktura", data);
+      // }
+
+      // struktura.find().then(async (result) => {
+      //   for (let i = 0; i < result.length; i++) {
+      //     const element = result[i];
+      //     await send_struktura(element);
+      //   }
+      // });
+
+      async function sendWithoutPhoto(element) {
+        console.log(`Sending struktura without photo: ${element.numer}`); // Debug log
         const data = {
           numer: element.numer,
           rodzaj: element.rodzaj,
+          polowanie: element.polowanie,
           longitude: element.longitude,
           latitude: element.latitude,
         };
         socket.emit("struktura", data);
       }
-
-      struktura.find().then(async (result) => {
-        for (let i = 0; i < result.length; i++) {
-          const element = result[i];
-          await send_struktura(element);
+      
+      async function allWithoutPhoto() {
+        console.log("Sending all structures without photo");
+      
+        try {
+          // Fetch all documents excluding the photo field
+          const allStruktura = await struktura.find({}, { photo: 0 }); // Exclude photo field using projection
+      
+          for (const element of allStruktura) {
+            sendWithoutPhoto(element); // Send each document to the client
+          }
+      
+          console.log("Finished sending all structures without photo");
+        } catch (err) {
+          console.error("Error fetching structures without photo:", err);
         }
-      });
+      }
+      
+      // Call the function when needed
+      allWithoutPhoto();
     }
   });
 

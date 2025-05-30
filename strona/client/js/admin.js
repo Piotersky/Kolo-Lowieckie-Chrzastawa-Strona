@@ -38,6 +38,7 @@ file_input.addEventListener("change", function () {
     reader.addEventListener("load", () => {
       var uploaded_image = reader.result;
 
+
       data = {
         img: uploaded_image,
         numer: document.getElementById("numer_s").value,
@@ -45,6 +46,7 @@ file_input.addEventListener("change", function () {
         longitude: document.getElementById("longitude").value,
         latitude: document.getElementById("latitude").value,
         polowanie: document.getElementById("polowanie").value,
+        dc_ann: document.getElementById("dc_ann").checked,
       };
 
       console.log(data);
@@ -73,6 +75,7 @@ add_polowanie_btn.addEventListener("click", () => {
     dystans: document.getElementById("dystans").value,
     znalezione_struktury: document.getElementById("znalezione_struktury").value,
     wynik: document.getElementById("wynik").value,
+    dc_ann: document.getElementById("dc_ann").checked,
   };
 
   socket.emit("add_polowanie", data);
