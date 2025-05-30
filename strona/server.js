@@ -4,7 +4,7 @@ const { Server } = require("socket.io");
 const { EmbedBuilder } = require("discord.js");
 const fs = require("fs");
 const mongoose = require("mongoose");
-const config = require("../config.js");
+const config = require("./config.js");
 const polowanie = require("./polowanie_schema.js");
 const struktura = require("./struktura_schema.js");
 const last = require("./last_schema.js");
@@ -544,7 +544,7 @@ module.exports = (client) => {
     }
   });
 
-  const port = 10000;
+  const port = 3000;
 
   httpServer.listen(port, () => {
     console.log(`Example app listening on port ${port}`);

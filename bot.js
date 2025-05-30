@@ -1,6 +1,6 @@
 const { Client, Collection, GatewayIntentBits } = require("discord.js");
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
-const config = require("./config.js");
+const config = require("./strona/config.js");
 const { readdirSync } = require("fs")
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v10');
