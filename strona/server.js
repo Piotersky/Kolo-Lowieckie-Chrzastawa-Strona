@@ -51,6 +51,7 @@ module.exports = (client) => {
   //MongoDB
 
   const uri = config.uri;
+  console.log(uri);
 
   mongoose
     .connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
