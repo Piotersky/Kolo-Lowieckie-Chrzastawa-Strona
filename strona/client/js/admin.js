@@ -57,10 +57,20 @@ var file_input = document.getElementById("file");
 //   });
 // });
 
+var add_struktura_btn = document.getElementById("add_s_btn");
+var file_input = document.getElementById("file");
+var isAddingStruktura = false; // Flag to prevent multiple socket events
+
 file_input.addEventListener("change", function () {
   add_struktura_btn.addEventListener("click", () => {
-    // Disable the button for 1 second
-    add_struktura_btn.disabled = true;
+    if (isAddingStruktura) {
+      console.warn("Adding struktura is already in progress.");
+      return; // Prevent sending another socket event
+    }
+
+    isAddingStruktura = true; // Set the flag to true
+    add_struktura_btn.disabled = true; // Disable the button temporarily
+
     setTimeout(() => {
       add_struktura_btn.disabled = false;
     }, 1000);
@@ -82,7 +92,11 @@ file_input.addEventListener("change", function () {
       console.log(data);
 
       socket.emit("add_struktura", data);
+
+      // Reset the flag after the socket event is sent
+      isAddingStruktura = false;
     });
+
     reader.readAsDataURL(this.files[0]);
   });
 });
