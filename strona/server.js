@@ -300,9 +300,8 @@ module.exports = (client) => {
 
         let discord = "🔢Nr. " + data.numer;
         if (data.numer == "") discord = "🔢 Bez numeru";
-        console.log(data.dc_ann);
 
-        if(data.dc_ann == "true") {
+        if(data.dc_ann == true) {
           setTimeout(() => {
             if (data.rodzaj == "1") {
               fs.writeFileSync(`temp.jpg`, raw_data, {
@@ -493,23 +492,6 @@ module.exports = (client) => {
     }
     if (socket.handshake.headers["subpage"] === "mapa") {
       log(`Socket **${socket.id}** connected on /mapa`);
-
-      // async function send_struktura(element) {
-      //   const data = {
-      //     numer: element.numer,
-      //     rodzaj: element.rodzaj,
-      //     longitude: element.longitude,
-      //     latitude: element.latitude,
-      //   };
-      //   socket.emit("struktura", data);
-      // }
-
-      // struktura.find().then(async (result) => {
-      //   for (let i = 0; i < result.length; i++) {
-      //     const element = result[i];
-      //     await send_struktura(element);
-      //   }
-      // });
 
       async function sendWithoutPhoto(element) {
         console.log(`Sending struktura without photo: ${element.numer}`); // Debug log

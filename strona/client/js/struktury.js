@@ -7,6 +7,7 @@ var socket = io({
 const parentDiv = document.getElementById("struktury");
 
 socket.on("struktura", (data) => {
+  console.log(data);
   let text = "";
   let numer = data.numer;
   let id;

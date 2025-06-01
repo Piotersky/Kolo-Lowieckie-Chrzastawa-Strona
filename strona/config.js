@@ -1,7 +1,6 @@
 process = require('process');
 require('dotenv').config({ path: '/etc/secrets/.env' });
 
-
 module.exports = {
   "prefix": "=",
   "owner": "697369775625732117",

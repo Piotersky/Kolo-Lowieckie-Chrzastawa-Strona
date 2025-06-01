@@ -32,12 +32,42 @@ socket.on("Authenticated", (data) => {
 var add_struktura_btn = document.getElementById("add_s_btn");
 var file_input = document.getElementById("file");
 
+// file_input.addEventListener("change", function () {
+//   add_struktura_btn.addEventListener("click", () => {
+//     const reader = new FileReader();
+//     reader.addEventListener("load", () => {
+//       var uploaded_image = reader.result;
+
+
+//       data = {
+//         img: uploaded_image,
+//         numer: document.getElementById("numer_s").value,
+//         rodzaj: document.getElementById("rodzaj").value,
+//         longitude: document.getElementById("longitude").value,
+//         latitude: document.getElementById("latitude").value,
+//         polowanie: document.getElementById("polowanie").value,
+//         dc_ann: document.getElementById("dc_ann").checked,
+//       };
+
+//       console.log(data);
+
+//       socket.emit("add_struktura", data);
+//     });
+//     reader.readAsDataURL(this.files[0]);
+//   });
+// });
+
 file_input.addEventListener("change", function () {
   add_struktura_btn.addEventListener("click", () => {
+    // Disable the button for 1 second
+    add_struktura_btn.disabled = true;
+    setTimeout(() => {
+      add_struktura_btn.disabled = false;
+    }, 1000);
+
     const reader = new FileReader();
     reader.addEventListener("load", () => {
       var uploaded_image = reader.result;
-
 
       data = {
         img: uploaded_image,
