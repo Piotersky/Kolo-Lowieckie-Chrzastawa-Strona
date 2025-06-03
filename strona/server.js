@@ -272,6 +272,7 @@ module.exports = (client) => {
         async function compressImage(base64Image) {
           const buffer = Buffer.from(base64Image, "base64");
           const compressedBuffer = await sharp(buffer)
+            .rotate() // Rotate to correct orientation
             .resize({ width: 270, height: 370 }) // Resize to reduce dimensions
             .jpeg({ quality: 80 }) // Compress to reduce quality
             .toBuffer();
@@ -527,7 +528,7 @@ module.exports = (client) => {
     }
   });
 
-  const port = 3000;
+  const port = process.env.PORT || 3000 
 
   httpServer.listen(port, () => {
     console.log(`Example app listening on port ${port}`);
