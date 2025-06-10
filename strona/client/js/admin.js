@@ -32,31 +32,6 @@ socket.on("Authenticated", (data) => {
 var add_struktura_btn = document.getElementById("add_s_btn");
 var file_input = document.getElementById("file");
 
-// file_input.addEventListener("change", function () {
-//   add_struktura_btn.addEventListener("click", () => {
-//     const reader = new FileReader();
-//     reader.addEventListener("load", () => {
-//       var uploaded_image = reader.result;
-
-
-//       data = {
-//         img: uploaded_image,
-//         numer: document.getElementById("numer_s").value,
-//         rodzaj: document.getElementById("rodzaj").value,
-//         longitude: document.getElementById("longitude").value,
-//         latitude: document.getElementById("latitude").value,
-//         polowanie: document.getElementById("polowanie").value,
-//         dc_ann: document.getElementById("dc_ann").checked,
-//       };
-
-//       console.log(data);
-
-//       socket.emit("add_struktura", data);
-//     });
-//     reader.readAsDataURL(this.files[0]);
-//   });
-// });
-
 var add_struktura_btn = document.getElementById("add_s_btn");
 var file_input = document.getElementById("file");
 var isAddingStruktura = false; // Flag to prevent multiple socket events

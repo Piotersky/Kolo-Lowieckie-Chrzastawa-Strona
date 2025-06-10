@@ -2,6 +2,7 @@
   "name": "kolo-lowieckie-strona",
   "version": "1.0.0",
   "description": "blah blah.",
+  "license": "MIT",
   "main": "bot.js",
   "scripts": {
     "dev-run": "nodemon bot.js",

@@ -31,6 +31,11 @@ socket.on("struktura", (data) => {
   polowanie = data.polowanie;
   if(data.polowanie == 0) polowanie = "przed zaczęciem zapisywania"
 
+  let hum_num = data.numer;
+  if(data.numer.contains("_")) {
+    hum_num = data.numer.split("_")[0];
+  }
+
   if (data.buffer == "") {
     parentDiv.innerHTML +=
       '<div class="struktura" id="div' +
@@ -50,7 +55,7 @@ socket.on("struktura", (data) => {
       '</p><p class="desc" id="desc' +
       id +
       '">🔢Numer: ' +
-      data.numer +
+      hum_num +
       "<br>🌐Szerokość geograficzna: " +
       data.latitude +
       "<br>🌐Długość geograficzna: " +
@@ -81,7 +86,7 @@ socket.on("struktura", (data) => {
     '</p><p class="desc" id="desc' +
     id +
     '">🔢Numer: ' +
-    data.numer +
+    hum_num +
     "<br>📒Polowanie: " +
     polowanie +
     "<br>🌐Szerokość geograficzna: " +

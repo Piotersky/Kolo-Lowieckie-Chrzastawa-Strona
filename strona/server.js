@@ -48,10 +48,8 @@ module.exports = (client) => {
     maxHttpBufferSize: 10e9,
   });
 
-  //MongoDB
 
   const uri = config.uri;
-  console.log(uri);
 
   mongoose
     .connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
@@ -66,11 +64,7 @@ module.exports = (client) => {
 
     log("Socket connected");
 
-
-    const data_dir = "./data/";
-
     async function send(element) {
-      console.log(`Sending struktura: ${element.numer}`); // Debug log
       const data = {
         numer: element.numer,
         rodzaj: element.rodzaj,
@@ -84,18 +78,18 @@ module.exports = (client) => {
 
     async function all() {
       console.log("Sending all structures");
-    
+
       try {
         // Fetch distinct numer values
         const distinctNumerValues = await struktura.distinct("numer");
-    
+
         for (const numer of distinctNumerValues) {
           const element = await struktura.findOne({ numer }); // Fetch the full document
           if (element) {
             send(element); // Send the unique document to the client
           }
         }
-    
+
         console.log("Finished sending all unique structures");
       } catch (err) {
         console.error("Error fetching unique structures:", err);
@@ -231,6 +225,8 @@ module.exports = (client) => {
 
       logged = false;
 
+
+
       socket.on("login", function (data) {
         log(`Try login on: **${socket.id}**`);
         if (data == config.admin_pas) {
@@ -269,6 +265,15 @@ module.exports = (client) => {
           nazwa = "n" + nazwa;
         }
 
+        // Check if a struktura with the same numer already exists
+        let existingStruktura = await struktura.findOne({ numer: nazwa });
+        let suffix = 1;
+        while (existingStruktura) {
+          nazwa = `${data.numer}_${suffix}`;
+          suffix++;
+          existingStruktura = await struktura.findOne({ numer: nazwa });
+        }
+
         async function compressImage(base64Image) {
           const buffer = Buffer.from(base64Image, "base64");
           const compressedBuffer = await sharp(buffer)
@@ -302,7 +307,7 @@ module.exports = (client) => {
         let discord = "🔢Nr. " + data.numer;
         if (data.numer == "") discord = "🔢 Bez numeru";
 
-        if(data.dc_ann == true) {
+        if (data.dc_ann == true) {
           setTimeout(() => {
             if (data.rodzaj == "1") {
               fs.writeFileSync(`temp.jpg`, raw_data, {
@@ -362,6 +367,7 @@ module.exports = (client) => {
           dystans: data.dystans,
           znalezione_struktury: data.znalezione_struktury,
           wynik: data.wynik,
+          dc_ann: data.dc_ann,
         });
 
         newPolowanie
@@ -384,72 +390,73 @@ module.exports = (client) => {
         if (data.wynik == 4) {
           wynik = "Zły";
         }
+        if (dc_ann == true) {
+          setTimeout(() => {
+            client.channels.cache
+              .get(`999685658572496906`)
+              .send(`📌Polowanie nr. ${data.numer}`);
+            client.channels.cache
+              .get(`999685864919683122`)
+              .send(`📌Polowanie nr. ${data.numer}`);
+            client.channels.cache
+              .get(`1004823240851599420`)
+              .send(`📌Polowanie nr. ${data.numer}`);
 
-        setTimeout(() => {
-          client.channels.cache
-            .get(`999685658572496906`)
-            .send(`📌Polowanie nr. ${data.numer}`);
-          client.channels.cache
-            .get(`999685864919683122`)
-            .send(`📌Polowanie nr. ${data.numer}`);
-          client.channels.cache
-            .get(`1004823240851599420`)
-            .send(`📌Polowanie nr. ${data.numer}`);
+            const embedVar = new EmbedBuilder()
+              .setTitle("Polowanie")
+              .setDescription("Dodano nowe polowanie")
+              .setColor(0x88000)
+              .addFields(
+                {
+                  name: "🔢Numer",
+                  value: data.numer,
+                  inline: false,
+                },
+                {
+                  name: "📆Data",
+                  value: data.data,
+                  inline: false,
+                },
+                {
+                  name: "🧭Teren",
+                  value: data.teren,
+                  inline: false,
+                },
+                {
+                  name: "💪Myśliwi",
+                  value: data.mysliwi,
+                  inline: false,
+                },
+                {
+                  name: "💸Budżet koła",
+                  value: data.budzet,
+                  inline: false,
+                },
+                {
+                  name: "🚲Przejechany dystans",
+                  value: data.dystans,
+                  inline: false,
+                },
+                {
+                  name: "🔎Znalezione ambony, zwyżki, wysiadki",
+                  value: data.znalezione_struktury,
+                  inline: false,
+                },
+                {
+                  name: "📝Wynik łowów",
+                  value: wynik,
+                  inline: false,
+                }
+              )
+              .setFooter({
+                text: "Koło Łowieckie Chrząstawa Bot - By PioterSky",
+              });
 
-          const embedVar = new EmbedBuilder()
-            .setTitle("Polowanie")
-            .setDescription("Dodano nowe polowanie")
-            .setColor(0x88000)
-            .addFields(
-              {
-                name: "🔢Numer",
-                value: data.numer,
-                inline: false,
-              },
-              {
-                name: "📆Data",
-                value: data.data,
-                inline: false,
-              },
-              {
-                name: "🧭Teren",
-                value: data.teren,
-                inline: false,
-              },
-              {
-                name: "💪Myśliwi",
-                value: data.mysliwi,
-                inline: false,
-              },
-              {
-                name: "💸Budżet koła",
-                value: data.budzet,
-                inline: false,
-              },
-              {
-                name: "🚲Przejechany dystans",
-                value: data.dystans,
-                inline: false,
-              },
-              {
-                name: "🔎Znalezione ambony, zwyżki, wysiadki",
-                value: data.znalezione_struktury,
-                inline: false,
-              },
-              {
-                name: "📝Wynik łowów",
-                value: wynik,
-                inline: false,
-              }
-            )
-            .setFooter({
-              text: "Koło Łowieckie Chrząstawa Bot - By PioterSky",
-            });
-
-          client.channels.cache
-            .get(`999410309108355214`)
-            .send({ embeds: [embedVar] });
-        }, 1000);
+            client.channels.cache
+              .get(`999410309108355214`)
+              .send({ embeds: [embedVar] });
+          }, 1000);
+        }
 
         log(`Added polowanie *${data.numer}* on: **${socket.id}**`);
       });
@@ -484,12 +491,25 @@ module.exports = (client) => {
         socket.emit("polowanie", data);
       }
 
-      polowanie.find().then(async (result) => {
-        for (let i = 0; i < result.length; i++) {
-          const element = result[i];
-          await send_polowanie(element);
+      allPolowania();
+
+      async function allPolowania() {
+        try {
+          // Await the result of the distinct method
+          const distinctPolowanieValues = await polowanie.distinct("numer");
+          console.log("Sending unique polowanias");
+      
+          // Iterate over the resolved array
+          for (const numer of distinctPolowanieValues) {
+            const element = await polowanie.findOne({ numer });
+            if (element) {
+              send_polowanie(element);
+            }
+          }
+        } catch (err) {
+          console.error("Error fetching unique polowanias:", err);
         }
-      });
+      }
     }
     if (socket.handshake.headers["subpage"] === "mapa") {
       log(`Socket **${socket.id}** connected on /mapa`);
@@ -505,30 +525,29 @@ module.exports = (client) => {
         };
         socket.emit("struktura", data);
       }
-      
+
       async function allWithoutPhoto() {
         console.log("Sending all structures without photo");
-      
+
         try {
           // Fetch all documents excluding the photo field
           const allStruktura = await struktura.find({}, { photo: 0 }); // Exclude photo field using projection
-      
+
           for (const element of allStruktura) {
             sendWithoutPhoto(element); // Send each document to the client
           }
-      
+
           console.log("Finished sending all structures without photo");
         } catch (err) {
           console.error("Error fetching structures without photo:", err);
         }
       }
-      
-      // Call the function when needed
+
       allWithoutPhoto();
     }
   });
 
-  const port = process.env.PORT || 3000 
+  const port = process.env.PORT || 3000
 
   httpServer.listen(port, () => {
     console.log(`Example app listening on port ${port}`);
