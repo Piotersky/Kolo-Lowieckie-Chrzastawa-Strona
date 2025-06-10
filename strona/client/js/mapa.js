@@ -22,8 +22,6 @@ window.onload = function () {
     popupAnchor: [0, -12], // Punkt zakotwiczenia dla popup
   });
 
-  console.log(customIcon); // Debugowanie
-
   socket.on("struktura", (data) => {
     console.log(data);
     latitude = parseFloat(data.latitude);
@@ -33,6 +31,10 @@ window.onload = function () {
       numer = data.numer;
     } else {
       numer = toString(data.numer);
+    }
+
+    if(data.numer.includes("_")) {
+      numer = data.numer.split("_")[0];
     }
 
     // let markerOptions = { icon: customIcon };

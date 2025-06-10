@@ -32,7 +32,7 @@ socket.on("struktura", (data) => {
   if(data.polowanie == 0) polowanie = "przed zaczęciem zapisywania"
 
   let hum_num = data.numer;
-  if(data.numer.contains("_")) {
+  if(data.numer.includes("_")) {
     hum_num = data.numer.split("_")[0];
   }
 
