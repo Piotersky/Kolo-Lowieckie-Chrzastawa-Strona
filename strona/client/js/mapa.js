@@ -33,8 +33,9 @@ window.onload = function () {
       numer = toString(data.numer);
     }
 
+    let hum_num = data.numer;
     if(data.numer.includes("_")) {
-      numer = data.numer.split("_")[0];
+      hum_num = data.numer.split("_")[0];
     }
 
     // let markerOptions = { icon: customIcon };
@@ -43,17 +44,17 @@ window.onload = function () {
     if (data.rodzaj == "1") {
       numer = L.marker([latitude, longitude], markerOptions)
         .addTo(map)
-        .bindPopup("Ambona " + data.numer);
+        .bindPopup("Ambona " + hum_num);
     }
     if (data.rodzaj == "2") {
       numer = L.marker([latitude, longitude], markerOptions)
         .addTo(map)
-        .bindPopup("Zwyżka " + data.numer);
+        .bindPopup("Zwyżka " + hum_num);
     }
     if (data.rodzaj == "3") {
       numer = L.marker([latitude, longitude], markerOptions)
         .addTo(map)
-        .bindPopup("Wysiadka " + data.numer);
+        .bindPopup("Wysiadka " + hum_num);
     }
   });
 

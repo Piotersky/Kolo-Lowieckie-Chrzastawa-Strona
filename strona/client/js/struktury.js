@@ -15,26 +15,26 @@ socket.on("struktura", (data) => {
   if (data.numer.startsWith("n")) {
     numer = "bez numeru";
   }
+  let hum_num = numer;
+  if(data.numer.includes("_")) {
+    hum_num = data.numer.split("_")[0];
+  }
+
   if (data.rodzaj == 1) {
-    text = "Ambona " + numer;
+    text = "Ambona " + hum_num;
     id = "A" + data.numer;
   }
   if (data.rodzaj == 2) {
-    text = "Zwyżka " + numer;
+    text = "Zwyżka " + hum_num;
     id = "Z" + data.numer;
   }
   if (data.rodzaj == 3) {
-    text = "Wysiadka " + numer;
+    text = "Wysiadka " + hum_num;
     id = "W" + data.numer;
   }
 
   polowanie = data.polowanie;
   if(data.polowanie == 0) polowanie = "przed zaczęciem zapisywania"
-
-  let hum_num = data.numer;
-  if(data.numer.includes("_")) {
-    hum_num = data.numer.split("_")[0];
-  }
 
   if (data.buffer == "") {
     parentDiv.innerHTML +=
