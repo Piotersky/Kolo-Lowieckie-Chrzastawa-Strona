@@ -390,7 +390,7 @@ module.exports = (client) => {
         if (data.wynik == 4) {
           wynik = "Zły";
         }
-        if (dc_ann == true) {
+        if (data.dc_ann == true) {
           setTimeout(() => {
             client.channels.cache
               .get(`999685658572496906`)

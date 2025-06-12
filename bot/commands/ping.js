@@ -1,4 +1,3 @@
-const { EmbedBuilder, PermissionsBitField } = require("discord.js");
 const { SlashCommandBuilder } = require("@discordjs/builders");
 
 module.exports = {
@@ -7,6 +6,5 @@ module.exports = {
     .setDescription("Pong!"),
     run: async (client, interaction) => {
       interaction.reply(`Pong 🏓`)
-      // komuta seçenekler eklemek istersen guide: https://discordjs.guide/interactions/slash-commands.html#options
     }
  };

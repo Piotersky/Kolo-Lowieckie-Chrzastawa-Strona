@@ -3,3 +3,4 @@ package-lock.json
 yarn.lock
 .env
 temp.jpg
+strona/config.js
