@@ -9,7 +9,12 @@ module.exports = {
         .setDescription('The song or video to play')
         .setRequired(true)),
     run: async (client, interaction) => {
-      interaction.reply(`Not implemented yet! Please provide a song or video query.`);
-      
+      // interaction.reply(`Not implemented yet! Please provide a song or video query.`);
+      if (!interaction.guild) return interaction.reply("This command can only be used in a server.");
+      const query = interaction.options.getString('query');
+      if (!query) return interaction.reply("Please provide a valid search query.");
+      interaction.member.voice.channel
+        ? interaction.reply(`Searching for: ${query}`)
+        : interaction.reply("You need to be in a voice channel to use this command.");
     }
  };

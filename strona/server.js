@@ -77,7 +77,7 @@ module.exports = (client) => {
     }
 
     async function all() {
-      console.log("Sending all structures");
+      // console.log("Sending all structures");
 
       try {
         // Fetch distinct numer values
@@ -90,7 +90,7 @@ module.exports = (client) => {
           }
         }
 
-        console.log("Finished sending all unique structures");
+        // console.log("Finished sending all unique structures");
       } catch (err) {
         console.error("Error fetching unique structures:", err);
       }
@@ -99,7 +99,7 @@ module.exports = (client) => {
     if (socket.handshake.headers["subpage"] === "struktury") {
       log(`Socket **${socket.id}** connected on /struktury`);
 
-      all();
+      all(); //On page load
 
       //On search
       socket.on("search", function (data) {
@@ -238,33 +238,27 @@ module.exports = (client) => {
       });
 
       socket.on("add_struktura", async function (data) {
+        log(`Starting adding struktura on: **${socket.id}**`);
         let number = 0;
         let nazwa = data.numer;
-
+      
         if (data.numer == "") {
-          //Read last "nieponumerowana" struktura number
-          await last.find({ rodzaj: data.rodzaj }).then((result) => {
-            number = result[0].numer + 1;
-          });
-
+          // Read last "nieponumerowana" struktura number
+          const result = await last.findOne({ rodzaj: data.rodzaj });
+          number = result ? result.numer + 1 : 1;
+      
           await last.deleteMany({ rodzaj: data.rodzaj });
-
+      
           const newLast = new last({
             numer: number,
             rodzaj: data.rodzaj,
           });
-
-          newLast
-            .save()
-            .then()
-            .catch((err) => {
-              console.error(err);
-            });
-
-          nazwa = number.toString();
-          nazwa = "n" + nazwa;
+      
+          await newLast.save().catch((err) => console.error(err));
+      
+          nazwa = "n" + number.toString();
         }
-
+      
         // Check if a struktura with the same numer already exists
         let existingStruktura = await struktura.findOne({ numer: nazwa });
         let suffix = 1;
@@ -273,7 +267,9 @@ module.exports = (client) => {
           suffix++;
           existingStruktura = await struktura.findOne({ numer: nazwa });
         }
-
+      
+        log(`Struktura will be added as ${nazwa} on: **${socket.id}**`);
+      
         async function compressImage(base64Image) {
           const buffer = Buffer.from(base64Image, "base64");
           const compressedBuffer = await sharp(buffer)
@@ -283,11 +279,41 @@ module.exports = (client) => {
             .toBuffer();
           return compressedBuffer.toString("base64");
         }
-
+      
+        async function compressImageToTargetSize(base64Image, targetSizeMB = 7.9) {
+          const targetSizeBytes = targetSizeMB * 1024 * 1024; // Convert MB to bytes
+          const buffer = Buffer.from(base64Image, "base64");
+      
+          // Get metadata to calculate scaling factor
+          const metadata = await sharp(buffer).metadata();
+          const currentSizeBytes = buffer.length;
+      
+          if (currentSizeBytes <= targetSizeBytes) {
+            // If the image is already within the target size, return it as is
+            return buffer.toString("base64");
+          }
+      
+          // Calculate scaling factor based on size ratio
+          const scalingFactor = Math.sqrt(targetSizeBytes / currentSizeBytes);
+      
+          // Resize the image using the scaling factor
+          const resizedBuffer = await sharp(buffer)
+            .rotate() // Rotate to correct orientation
+            .resize({
+              width: Math.floor(metadata.width * scalingFactor),
+              height: Math.floor(metadata.height * scalingFactor),
+            })
+            .jpeg({ quality: 80 }) // Adjust quality if needed
+            .toBuffer();
+      
+          return resizedBuffer.toString("base64");
+        }
+      
         raw_data = data.img.split(";base64,").pop();
-
+      
         const compressedPhoto = await compressImage(raw_data);
-
+        const resizedPhoto = await compressImageToTargetSize(raw_data, 7.9); // Resize to fit within 8MB
+      
         const newStruktura = new struktura({
           numer: nazwa,
           rodzaj: data.rodzaj,
@@ -296,59 +322,28 @@ module.exports = (client) => {
           polowanie: data.polowanie,
           photo: compressedPhoto,
         });
-
-        newStruktura
-          .save()
-          .then()
-          .catch((err) => {
-            console.error(err);
-          });
-
-        let discord = "🔢Nr. " + data.numer;
+      
+        await newStruktura.save().catch((err) => console.error(err));
+      
+        let discord = `🔢Nr. ${data.numer}`;
         if (data.numer == "") discord = "🔢 Bez numeru";
-
-        if (data.dc_ann == true) {
-          setTimeout(() => {
-            if (data.rodzaj == "1") {
-              fs.writeFileSync(`temp.jpg`, raw_data, {
-                encoding: "base64",
-              });
-
-              setTimeout(() => {
-                client.channels.cache.get(`999685658572496906`).send(discord);
-                client.channels.cache.get(`999685658572496906`).send({
-                  files: [`temp.jpg`],
-                });
-              }, 1000);
-            }
-
-            if (data.rodzaj == "2") {
-              fs.writeFileSync(`temp.jpg`, raw_data, {
-                encoding: "base64",
-              });
-
-              setTimeout(() => {
-                client.channels.cache.get(`999685864919683122`).send(discord);
-                client.channels.cache.get(`999685864919683122`).send({
-                  files: [`temp.jpg`],
-                });
-              }, 1000);
-            }
-
-            if (data.rodzaj == "3") {
-              fs.writeFileSync(`temp.jpg`, raw_data, {
-                encoding: "base64",
-              });
-
-              setTimeout(() => {
-                client.channels.cache.get(`1004823240851599420`).send(discord);
-                client.channels.cache.get(`1004823240851599420`).send({
-                  files: [`temp.jpg`],
-                });
-              }, 1000);
-            }
-          }, 1000);
+      
+        if (data.dc_ann === true) {
+          fs.writeFileSync(`temp.jpg`, resizedPhoto, { encoding: "base64" });
+      
+          const channelMap = {
+            "1": "999685658572496906",
+            "2": "999685864919683122",
+            "3": "1004823240851599420",
+          };
+      
+          const channelId = channelMap[data.rodzaj];
+          if (channelId) {
+            client.channels.cache.get(channelId).send(discord);
+            client.channels.cache.get(channelId).send({ files: [`temp.jpg`] });
+          }
         }
+      
         log(`Added struktura *${nazwa}* on: **${socket.id}**`);
       });
 

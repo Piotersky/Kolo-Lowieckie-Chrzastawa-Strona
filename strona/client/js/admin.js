@@ -60,7 +60,7 @@ file_input.addEventListener("change", function () {
         rodzaj: document.getElementById("rodzaj").value,
         longitude: document.getElementById("longitude").value,
         latitude: document.getElementById("latitude").value,
-        polowanie: document.getElementById("polowanie").value,
+        polowanie: document.getElementById("polowanie").value || "0",
         dc_ann: document.getElementById("dc_ann").checked,
       };
 
