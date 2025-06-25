@@ -55,7 +55,7 @@ socket.on("struktura", (data) => {
       '</p><p class="desc" id="desc' +
       id +
       '">🔢Numer: ' +
-      hum_num +
+      data.numer +
       "<br>🌐Szerokość geograficzna: " +
       data.latitude +
       "<br>🌐Długość geograficzna: " +
@@ -86,7 +86,7 @@ socket.on("struktura", (data) => {
     '</p><p class="desc" id="desc' +
     id +
     '">🔢Numer: ' +
-    hum_num +
+    data.numer +
     "<br>📒Polowanie: " +
     polowanie +
     "<br>🌐Szerokość geograficzna: " +

@@ -50,6 +50,7 @@ module.exports = (client) => {
 
 
   const uri = config.uri;
+  const sentPhotos = new Set();
 
   mongoose
     .connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
@@ -77,22 +78,69 @@ module.exports = (client) => {
     }
 
     async function all() {
-      // console.log("Sending all structures");
-
       try {
-        // Fetch distinct numer values
-        const distinctNumerValues = await struktura.distinct("numer");
-
-        for (const numer of distinctNumerValues) {
-          const element = await struktura.findOne({ numer }); // Fetch the full document
+        const sortedDocuments = await struktura.aggregate([
+          {
+            $addFields: {
+              baseNumber: {
+                $convert: {
+                  input: { $arrayElemAt: [{ $split: ["$numer", "_"] }, 0] }, // Extract base number before "_"
+                  to: "double",
+                  onError: null, // Handle non-numeric values
+                  onNull: null,
+                },
+              },
+              suffix: {
+                $ifNull: [
+                  { $arrayElemAt: [{ $split: ["$numer", "_"] }, 1] }, // Extract suffix after "_"
+                  "", // Assign empty string if suffix is null
+                ],
+              },
+              suffixAsNumber: {
+                $convert: {
+                  input: { $arrayElemAt: [{ $split: ["$numer", "_"] }, 1] }, // Convert suffix to a number
+                  to: "double",
+                  onError: null, // Handle non-numeric suffixes
+                  onNull: null, // Handle null suffixes
+                },
+              },
+              prefix: {
+                $regexFind: { input: "$numer", regex: /^[a-zA-Z]+/ }, // Extract prefix (e.g., "n" from "n1")
+              },
+              prefixNumber: {
+                $convert: {
+                  input: { $regexFind: { input: "$numer", regex: /[0-9]+$/ } }, // Extract numeric part of prefixed values
+                  to: "double",
+                  onError: null, // Handle non-numeric values
+                  onNull: null, // Handle null values
+                },
+              },
+              isNumeric: {
+                $regexMatch: { input: "$numer", regex: /^[0-9]+(_[0-9]+)?$/ }, // Check if numer is numeric or numeric with suffix
+              },
+            },
+          },
+          {
+            $sort: {
+              isNumeric: -1, // Numeric values (true) first, prefixed values (false) later
+              baseNumber: 1, // Sort by base number (numeric order)
+              suffixAsNumber: 1, // Sort suffix numerically
+              prefix: 1, // Sort by prefix alphabetically
+              prefixNumber: 1, // Sort numeric part of prefixed values mathematically
+              numer: 1, // Fallback for non-numeric values (alphabetical order)
+            },
+          },
+        ]);
+    
+        for (const element of sortedDocuments) {
           if (element) {
-            send(element); // Send the unique document to the client
+            send(element); // Send each document to the client
           }
         }
-
-        // console.log("Finished sending all unique structures");
+    
+        console.log("Finished sending all structures with proper sorting");
       } catch (err) {
-        console.error("Error fetching unique structures:", err);
+        console.error("Error fetching sorted structures:", err);
       }
     }
 
@@ -228,7 +276,6 @@ module.exports = (client) => {
 
 
       socket.on("login", function (data) {
-        log(`Try login on: **${socket.id}**`);
         if (data == config.admin_pas) {
           logged = true;
 
@@ -238,6 +285,11 @@ module.exports = (client) => {
       });
 
       socket.on("add_struktura", async function (data) {
+        if(!logged) {
+          log(`Unauthorized attempt to add struktura on: **${socket.id}**`);
+          return;
+        }
+
         log(`Starting adding struktura on: **${socket.id}**`);
         let number = 0;
         let nazwa = data.numer;
@@ -271,13 +323,18 @@ module.exports = (client) => {
         log(`Struktura will be added as ${nazwa} on: **${socket.id}**`);
       
         async function compressImage(base64Image) {
-          const buffer = Buffer.from(base64Image, "base64");
-          const compressedBuffer = await sharp(buffer)
-            .rotate() // Rotate to correct orientation
-            .resize({ width: 270, height: 370 }) // Resize to reduce dimensions
-            .jpeg({ quality: 80 }) // Compress to reduce quality
-            .toBuffer();
-          return compressedBuffer.toString("base64");
+          try {
+            const buffer = Buffer.from(base64Image, "base64");
+            const compressedBuffer = await sharp(buffer)
+              .rotate()
+              .resize({ width: 270, height: 370 })
+              .jpeg({ quality: 80 })
+              .toBuffer();
+            return compressedBuffer.toString("base64");
+          } catch (err) {
+            console.error("Error during image compression:", err);
+            throw err; // Re-throw the error if needed
+          }
         }
       
         async function compressImageToTargetSize(base64Image, targetSizeMB = 7.9) {
@@ -329,7 +386,13 @@ module.exports = (client) => {
         if (data.numer == "") discord = "🔢 Bez numeru";
       
         if (data.dc_ann === true) {
-          fs.writeFileSync(`temp.jpg`, resizedPhoto, { encoding: "base64" });
+          if (sentPhotos.has(nazwa)) {
+            log(`Photo for ${nazwa} already sent.`);
+            return;
+          }
+
+          const tempFileName = `temp_${Date.now()}.jpg`;
+          fs.writeFileSync(tempFileName, resizedPhoto, { encoding: "base64" });
       
           const channelMap = {
             "1": "999685658572496906",
@@ -340,7 +403,12 @@ module.exports = (client) => {
           const channelId = channelMap[data.rodzaj];
           if (channelId) {
             client.channels.cache.get(channelId).send(discord);
-            client.channels.cache.get(channelId).send({ files: [`temp.jpg`] });
+            client.channels.cache.get(channelId).send({ files: [tempFileName] }).then(() => {
+              fs.unlinkSync(tempFileName); // Delete the temporary file
+              sentPhotos.add(nazwa);
+            }).catch(err => {
+              log("Error sending file to Discord:", err);
+            });
           }
         }
       
@@ -348,11 +416,21 @@ module.exports = (client) => {
       });
 
       socket.on("del_struktura", async function (data) {
+        if(!logged) {
+          log(`Unauthorized attempt to delete struktura on: **${socket.id}**`);
+          return;
+        }
+
         await struktura.deleteMany({ numer: data.numer, rodzaj: data.rodzaj });
         log(`Deleted struktura *${data.numer}* on: **${socket.id}**`);
       });
 
       socket.on("add_polowanie", function (data) {
+        if(!logged) {
+          log(`Unauthorized attempt to add polowanie on: **${socket.id}**`);
+          return;
+        }
+
         const newPolowanie = new polowanie({
           numer: data.numer,
           data: data.data,
@@ -457,6 +535,11 @@ module.exports = (client) => {
       });
 
       socket.on("del_polowanie", async function (data) {
+        if(!logged) {
+          log(`Unauthorized attempt to delete polowanie on: **${socket.id}**`);
+          return;
+        }
+
         await polowanie.deleteMany({ numer: data });
         log(`Deleted polowanie *${data}* on: **${socket.id}**`);
       });
