@@ -7,6 +7,6 @@ module.exports = {
   "token": process.env.token,
   "username": process.env.username,
   "password": process.env.password,
-  "admin_pas":process.env.admin_pas,
+  "admin_pas": process.env.admin_pas,
   "uri": process.env.uri
 }

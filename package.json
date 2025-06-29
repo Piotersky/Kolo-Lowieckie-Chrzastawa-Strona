@@ -23,6 +23,7 @@
     "express": "^4.14.0",
     "http": "0.0.0",
     "mediaplex": "^1.0.0",
+    "mongodb": "^6.17.0",
     "mongoose": "^7.0.3",
     "nodemon": "^2.0.6",
     "process": "^0.11.10",

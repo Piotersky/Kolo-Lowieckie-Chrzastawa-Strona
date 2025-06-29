@@ -130,14 +130,14 @@ module.exports = (client) => {
               numer: 1, // Fallback for non-numeric values (alphabetical order)
             },
           },
-        ]);
-    
+        ]); // Use allowDiskUse for large datasets
+
         for (const element of sortedDocuments) {
           if (element) {
             send(element); // Send each document to the client
           }
         }
-    
+
         console.log("Finished sending all structures with proper sorting");
       } catch (err) {
         console.error("Error fetching sorted structures:", err);
@@ -285,7 +285,7 @@ module.exports = (client) => {
       });
 
       socket.on("add_struktura", async function (data) {
-        if(!logged) {
+        if (!logged) {
           log(`Unauthorized attempt to add struktura on: **${socket.id}**`);
           return;
         }
@@ -293,35 +293,39 @@ module.exports = (client) => {
         log(`Starting adding struktura on: **${socket.id}**`);
         let number = 0;
         let nazwa = data.numer;
-      
+
         if (data.numer == "") {
           // Read last "nieponumerowana" struktura number
           const result = await last.findOne({ rodzaj: data.rodzaj });
           number = result ? result.numer + 1 : 1;
-      
+
           await last.deleteMany({ rodzaj: data.rodzaj });
-      
+
           const newLast = new last({
             numer: number,
             rodzaj: data.rodzaj,
           });
-      
+
           await newLast.save().catch((err) => console.error(err));
-      
+
           nazwa = "n" + number.toString();
         }
-      
+
         // Check if a struktura with the same numer already exists
         let existingStruktura = await struktura.findOne({ numer: nazwa });
         let suffix = 1;
         while (existingStruktura) {
-          nazwa = `${data.numer}_${suffix}`;
+          if (data.numer == "") {
+            nazwa = `n${number}_${suffix}`;
+          } else {
+            nazwa = `${data.numer}_${suffix}`;
+          }
           suffix++;
           existingStruktura = await struktura.findOne({ numer: nazwa });
         }
-      
+
         log(`Struktura will be added as ${nazwa} on: **${socket.id}**`);
-      
+
         async function compressImage(base64Image) {
           try {
             const buffer = Buffer.from(base64Image, "base64");
@@ -336,23 +340,23 @@ module.exports = (client) => {
             throw err; // Re-throw the error if needed
           }
         }
-      
+
         async function compressImageToTargetSize(base64Image, targetSizeMB = 7.9) {
           const targetSizeBytes = targetSizeMB * 1024 * 1024; // Convert MB to bytes
           const buffer = Buffer.from(base64Image, "base64");
-      
+
           // Get metadata to calculate scaling factor
           const metadata = await sharp(buffer).metadata();
           const currentSizeBytes = buffer.length;
-      
+
           if (currentSizeBytes <= targetSizeBytes) {
             // If the image is already within the target size, return it as is
             return buffer.toString("base64");
           }
-      
+
           // Calculate scaling factor based on size ratio
           const scalingFactor = Math.sqrt(targetSizeBytes / currentSizeBytes);
-      
+
           // Resize the image using the scaling factor
           const resizedBuffer = await sharp(buffer)
             .rotate() // Rotate to correct orientation
@@ -362,15 +366,15 @@ module.exports = (client) => {
             })
             .jpeg({ quality: 80 }) // Adjust quality if needed
             .toBuffer();
-      
+
           return resizedBuffer.toString("base64");
         }
-      
+
         raw_data = data.img.split(";base64,").pop();
-      
+
         const compressedPhoto = await compressImage(raw_data);
         const resizedPhoto = await compressImageToTargetSize(raw_data, 7.9); // Resize to fit within 8MB
-      
+
         const newStruktura = new struktura({
           numer: nazwa,
           rodzaj: data.rodzaj,
@@ -379,12 +383,12 @@ module.exports = (client) => {
           polowanie: data.polowanie,
           photo: compressedPhoto,
         });
-      
+
         await newStruktura.save().catch((err) => console.error(err));
-      
+
         let discord = `🔢Nr. ${data.numer}`;
         if (data.numer == "") discord = "🔢 Bez numeru";
-      
+
         if (data.dc_ann === true) {
           if (sentPhotos.has(nazwa)) {
             log(`Photo for ${nazwa} already sent.`);
@@ -393,13 +397,13 @@ module.exports = (client) => {
 
           const tempFileName = `temp_${Date.now()}.jpg`;
           fs.writeFileSync(tempFileName, resizedPhoto, { encoding: "base64" });
-      
+
           const channelMap = {
             "1": "999685658572496906",
             "2": "999685864919683122",
             "3": "1004823240851599420",
           };
-      
+
           const channelId = channelMap[data.rodzaj];
           if (channelId) {
             client.channels.cache.get(channelId).send(discord);
@@ -411,12 +415,12 @@ module.exports = (client) => {
             });
           }
         }
-      
+
         log(`Added struktura *${nazwa}* on: **${socket.id}**`);
       });
 
       socket.on("del_struktura", async function (data) {
-        if(!logged) {
+        if (!logged) {
           log(`Unauthorized attempt to delete struktura on: **${socket.id}**`);
           return;
         }
@@ -426,7 +430,7 @@ module.exports = (client) => {
       });
 
       socket.on("add_polowanie", function (data) {
-        if(!logged) {
+        if (!logged) {
           log(`Unauthorized attempt to add polowanie on: **${socket.id}**`);
           return;
         }
@@ -535,7 +539,7 @@ module.exports = (client) => {
       });
 
       socket.on("del_polowanie", async function (data) {
-        if(!logged) {
+        if (!logged) {
           log(`Unauthorized attempt to delete polowanie on: **${socket.id}**`);
           return;
         }
@@ -576,7 +580,7 @@ module.exports = (client) => {
           // Await the result of the distinct method
           const distinctPolowanieValues = await polowanie.distinct("numer");
           console.log("Sending unique polowanias");
-      
+
           // Iterate over the resolved array
           for (const numer of distinctPolowanieValues) {
             const element = await polowanie.findOne({ numer });
@@ -627,7 +631,16 @@ module.exports = (client) => {
 
   const port = process.env.PORT || 3000
 
-  httpServer.listen(port, () => {
+  httpServer.listen(port, async () => {
     console.log(`Example app listening on port ${port}`);
+
+    const polowaniaCount = await polowanie.countDocuments();
+    const strukturyCount = await struktura.countDocuments();
+
+    fs.writeFileSync(
+      __dirname + "/data/data.json",
+      JSON.stringify({ polowania: polowaniaCount, struktury: strukturyCount }, null, 2),
+      "utf8"
+    );
   });
 };

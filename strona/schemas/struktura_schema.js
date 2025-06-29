@@ -23,5 +23,5 @@ const struktura_schema = new mongoose.Schema({
     required: true,
   },
 });
-const struktura = mongoose.model("2strukturys", struktura_schema);
+const struktura = mongoose.model("tstrukturys", struktura_schema);
 module.exports = struktura;
