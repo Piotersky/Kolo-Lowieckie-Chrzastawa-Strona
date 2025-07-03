@@ -22,7 +22,8 @@ module.exports = (client) => {
   app.get("/", function (req, res) {
     res.sendFile(__dirname + "/client/index.html");
   });
-  app.use("/data", express.static(__dirname + "/data")); // Dodaj folder z plikiem GeoJSON
+  app.use("/data", express.static(__dirname + "/data"));
+
   app.get("/struktury", (req, res) => {
     res.sendFile(__dirname + "/client/struktury.html");
   });
@@ -132,11 +133,24 @@ module.exports = (client) => {
           },
         ]); // Use allowDiskUse for large datasets
 
-        for (const element of sortedDocuments) {
-          if (element) {
-            send(element); // Send each document to the client
-          }
-        }
+        // for (const element of sortedDocuments) {
+        //   if (element) {
+        //     send(element); // Send each document to the client
+        //   }
+        // }
+
+        //26.62 s not batched
+        //8.67 s 10/batch
+        //8.99 s 25/batch
+        //8.92 s 50/batch
+        //21.31 s 100/batch
+
+
+        const batchSize = 50; // Adjust batch size as needed
+    for (let i = 0; i < sortedDocuments.length; i += batchSize) {
+      const batch = sortedDocuments.slice(i, i + batchSize);
+      socket.emit("struktura_batch", batch); // Send a batch of documents
+    }
 
         console.log("Finished sending all structures with proper sorting");
       } catch (err) {
@@ -202,69 +216,6 @@ module.exports = (client) => {
             });
           }
         }
-
-        // function another(type, multiple, file) {
-        //   if (data.val == "n") {
-        //     if (multiple) {
-        //       files(type, function (file) {
-        //         send(type, file, function (data) {
-        //           if (data.numer.startsWith("n")) {
-        //             socket.emit("struktura", data);
-        //           }
-        //         });
-        //       });
-        //     }
-        //     if (!multiple) {
-        //       send(type, file, function (data) {
-        //         if (data.number.startsWith("n")) {
-        //           socket.emit("struktura", data);
-        //         }
-        //       });
-        //     }
-        //     return;
-        //   }
-        //   if (data.val == "") {
-        //     if (multiple) {
-        //       files(type, function (file) {
-        //         send(type, file, function (data) {
-        //           socket.emit("struktura", data);
-        //         });
-        //       });
-        //     }
-        //     if (!multiple) {
-        //       send(type, file, function (data) {
-        //         socket.emit("struktura", data);
-        //       });
-        //     }
-        //     return;
-        //   }
-        // }
-
-        // for (let i = 1; i < 4; i++) {
-        //   const element = data.rodzaj[i - 1];
-
-        //   if (element) {
-        //     struktura.find().then(async (result) => {
-        //       for (let i = 0; i < result.length; i++) {
-        //         const element = result[i];
-        //         if (element.rodzaj == i) {
-        //           await send(element);
-        //         }
-        //       }
-        //     });
-        //   }
-        // }
-
-        // for (let i = 1; i < 4; i++) {
-        //   another(i, true, "");
-        // }
-
-        // file = data.val + ".json";
-        // for (let i = 1; i < 4; i++) {
-        //   send(i, file, function (data) {
-        //     socket.emit("struktura", data);
-        //   });
-        // }
       });
     }
 

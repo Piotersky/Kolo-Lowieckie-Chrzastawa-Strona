@@ -100,6 +100,102 @@ socket.on("struktura", (data) => {
     '"></div>';
 });
 
+socket.on("struktura_batch", (batch) => {
+  batch.forEach((data) => {
+    console.log(data);
+    let text = "";
+    let numer = data.numer;
+    let id;
+
+    if (data.numer.startsWith("n")) {
+      numer = "bez numeru";
+    }
+    let hum_num = numer;
+    if (data.numer.includes("_")) {
+      hum_num = data.numer.split("_")[0];
+    }
+
+    if (data.rodzaj == 1) {
+      text = "Ambona " + hum_num;
+      id = "A" + data.numer;
+    }
+    if (data.rodzaj == 2) {
+      text = "Zwyżka " + hum_num;
+      id = "Z" + data.numer;
+    }
+    if (data.rodzaj == 3) {
+      text = "Wysiadka " + hum_num;
+      id = "W" + data.numer;
+    }
+
+    polowanie = data.polowanie;
+    if (data.polowanie == 0) polowanie = "przed zaczęciem zapisywania";
+
+    if (data.buffer == "") {
+      parentDiv.innerHTML +=
+        '<div class="struktura" id="div' +
+        id +
+        '" onmouseleave="leave(' +
+        "'" +
+        id +
+        "'" +
+        ')" onmouseover="hover(' +
+        "'" +
+        id +
+        "'" +
+        ')"><p class="title" id="title' +
+        id +
+        '">' +
+        text +
+        '</p><p class="desc" id="desc' +
+        id +
+        '">🔢Numer: ' +
+        data.numer +
+        "<br>🌐Szerokość geograficzna: " +
+        data.latitude +
+        "<br>🌐Długość geograficzna: " +
+        data.longitude +
+        "<br>📒Polowanie: " +
+        polowanie +
+        '</p><img id="img' +
+        id +
+        '" class="img" src="client/img/no_img.png"></div>';
+      return;
+    }
+
+    parentDiv.innerHTML +=
+      '<div class="struktura" id="div' +
+      id +
+      '" onmouseleave="leave(' +
+      "'" +
+      id +
+      "'" +
+      ')" onmouseover="hover(' +
+      "'" +
+      id +
+      "'" +
+      ')"><p class="title" id="title' +
+      id +
+      '">' +
+      text +
+      '</p><p class="desc" id="desc' +
+      id +
+      '">🔢Numer: ' +
+      data.numer +
+      "<br>📒Polowanie: " +
+      polowanie +
+      "<br>🌐Szerokość geograficzna: " +
+      data.latitude +
+      "<br>🌐Długość geograficzna: " +
+      data.longitude +
+      '</p><img id="img' +
+      id +
+      '" class="img" src="data:image/png;base64, ' +
+      data.photo +
+      '"></div>';
+  });
+});
+
 var szukaj = document.getElementById("szukaj");
 
 function hover(numer) {
