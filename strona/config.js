@@ -8,5 +8,6 @@ module.exports = {
   "username": process.env.username,
   "password": process.env.password,
   "admin_pas": process.env.admin_pas,
-  "uri": process.env.uri
+  "uri": process.env.uri,
+  "batch_size": 50,
 }

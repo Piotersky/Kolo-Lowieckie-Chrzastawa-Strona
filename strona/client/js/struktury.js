@@ -5,9 +5,12 @@ var socket = io({
 });
 
 const parentDiv = document.getElementById("struktury");
+let elem_num = 0;
 
 socket.on("struktura", (data) => {
-  console.log(data);
+  
+  
+  
   let text = "";
   let numer = data.numer;
   let id;
@@ -101,8 +104,14 @@ socket.on("struktura", (data) => {
 });
 
 socket.on("struktura_batch", (batch) => {
+  console.log("Received batch of structures:", batch);
+  let html = "";
   batch.forEach((data) => {
-    console.log(data);
+    elem_num++;
+    if (elem_num != 0) {
+      document.getElementById("loading").style.display = "none";
+    }
+
     let text = "";
     let numer = data.numer;
     let id;
@@ -128,11 +137,11 @@ socket.on("struktura_batch", (batch) => {
       id = "W" + data.numer;
     }
 
-    polowanie = data.polowanie;
+    let polowanie = data.polowanie;
     if (data.polowanie == 0) polowanie = "przed zaczęciem zapisywania";
 
     if (data.buffer == "") {
-      parentDiv.innerHTML +=
+      html +=
         '<div class="struktura" id="div' +
         id +
         '" onmouseleave="leave(' +
@@ -163,7 +172,7 @@ socket.on("struktura_batch", (batch) => {
       return;
     }
 
-    parentDiv.innerHTML +=
+    html +=
       '<div class="struktura" id="div' +
       id +
       '" onmouseleave="leave(' +
@@ -194,6 +203,7 @@ socket.on("struktura_batch", (batch) => {
       data.photo +
       '"></div>';
   });
+  parentDiv.innerHTML += html;
 });
 
 var szukaj = document.getElementById("szukaj");

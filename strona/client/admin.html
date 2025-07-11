@@ -1,130 +1,117 @@
 <!DOCTYPE html>
 <html lang="pl">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <link type="text/css" rel="stylesheet" href="client/css/admin.css" />
-    <link type="image/x-icon" rel="icon" href="client/img/koo_Ch.ico" />
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>Panel administratora</title>
-  </head>
-  <body>
-    <div id="login">
-      <h1>Zaloguj się:</h1>
-      <p id="info"></p>
-      <input type="password" id="password" placeholder="Hasło" />
-      <button id="login_btn">Zaloguj się</button>
-    </div>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
-    <main>
-      <ul>
-        <li>
-          <h1>Struktura</h1>
+  <link type="text/css" rel="stylesheet" href="client/css/admin.css" />
+  <link type="image/x-icon" rel="icon" href="client/img/koo_Ch.ico" />
 
-          <input type="text" placeholder="Wpisz numer struktury" id="numer_s" />
-          <br />Podpowiedź: Jeżeli jest nieponumerowana zostaw to pole puste
+  <title>Panel administratora</title>
+</head>
 
-          <br /><br />Rodzaj struktury<select id="rodzaj" title="sadsad">
-            <option value="1">Ambona</option>
-            <option value="2">Zwyżka</option>
-            <option value="3">Wysiadka</option>
-          </select>
+<body>
+  <div id="login">
+    <h1>Zaloguj się:</h1>
+    <p id="info"></p>
+    <input type="password" id="password" placeholder="Hasło" />
+    <button id="login_btn">Zaloguj się</button>
+  </div>
 
-          <br />
-          <br /><input type="number" id="polowanie" placeholder="Wpisz numer polowania na którym została znaleziona">
-          <br />Podpowiedź: Jeżeli nie ma numeru zostaw to pole puste lub wpisz 0
-          <br />
-          <br /><input
-            type="file"
-            id="file"
-            value="Wybierz zdjęcie"
-            accept="image/*"
-            placeholder="sdsdssad"
-          />
+  <main>
+    <ul>
+      <li>
+        <h1>Struktura</h1>
 
-          <br /><br />Szerokosć geograficzna:
-          <input placeholder="np. 51.087654" type="text" id="latitude" />
-          <br />Długość geograficzna:
-          <input type="text" placeholder="np. 17.328204" id="longitude" />
+        <input type="text" placeholder="Wpisz numer struktury" id="numer_s" />
+        <br />Podpowiedź: Jeżeli jest nieponumerowana zostaw to pole puste
 
-          <br /><br /><br /><button id="add_s_btn">Dodaj!</button>
+        <br /><br />Rodzaj struktury<select id="rodzaj" title="sadsad">
+          <option value="1">Ambona</option>
+          <option value="2">Zwyżka</option>
+          <option value="3">Wysiadka</option>
+        </select>
 
-          <br><br><br><input type="text" placeholder="Wpisz numer usuwanej struktury" id="del_s" />
-          <br />Podpowiedź: jeżeli struktura nie ma numeru, wpisz "n?", gdzie ?, to numer, który wyświetla się po najechaniu na nią w zakładce struktury.
-          <br />Rodzaj usuwanej struktury<select id="rodzaj_del" title="sdds">
-            <option value=1>Ambona</option>
-            <option value=2>Zwyżka</option>
-            <option value=3>Wysiadka</option>
-          </select>
-          <br /><br /><button id="del_s_btn">Usuń!</button>
-        </li>
-        <li>
-          <h1>Polowanie</h1>
+        <br />
+        <br /><input type="number" id="polowanie" placeholder="Wpisz numer polowania na którym została znaleziona">
+        <br />Podpowiedź: Jeżeli nie ma numeru zostaw to pole puste lub wpisz 0
+        <br />
+        <br /><input type="file" id="file" value="Wybierz zdjęcie" accept="image/*" placeholder="sdsdssad" />
 
-          <input
-            type="number"
-            placeholder="Wpisz numer polowania"
-            id="numer_p"
-            deafult="0"
-          />
+        <br /><br />Szerokosć geograficzna:
+        <input placeholder="np. 51.087654" type="text" id="latitude" />
+        <br />Długość geograficzna:
+        <input type="text" placeholder="np. 17.328204" id="longitude" />
 
-          <br /><br /><input
-            type="text"
-            placeholder="Wpisz datę polowania (??.??.????)"
-            id="data"
-          />
+        <br /><br />
+        <div id="map" style="height: 200px; width: 100%; cursor:crosshair;"></div>
+        <p>Kliknij na mapę, aby wybrać lokalizację.</p><br />
+        <input title="dc_ann" type="checkbox" id="dc_ann" checked>Wysyłaj informacje na discord</input>
 
-          <br /><br /><input
-            type="text"
-            placeholder="Wpisz teren, na którym odbyło się polowanie (nazwy miejscowości itd.)"
-            id="teren"
-          />
+        <br /><button id="add_s_btn">Dodaj!</button>
 
-          <br /><br /><input
-            type="text"
-            placeholder="Wpisz myśliwych będących na polowaniu (?, ?, ...)"
-            id="mysliwi"
-          />
+        <br><br><br><input type="text" placeholder="Wpisz numer usuwanej struktury" id="del_s" />
+        <br />Podpowiedź: jeżeli struktura nie ma numeru, wpisz "n?", gdzie ?, to numer, który wyświetla się po
+        najechaniu na nią w zakładce struktury.
+        <br />Rodzaj usuwanej struktury<select id="rodzaj_del" title="sdds">
+          <option value=1>Ambona</option>
+          <option value=2>Zwyżka</option>
+          <option value=3>Wysiadka</option>
+        </select>
+        <br /><br /><button id="del_s_btn">Usuń!</button>
+      </li>
+      <li>
+        <h1>Polowanie</h1>
 
-          <br /><br /><input
-            type="text"
-            placeholder="Wpisz budżet polowania (zł)"
-            id="budzet"
-          />
+        <input type="number" placeholder="Wpisz numer polowania" id="numer_p" deafult="0" />
 
-          <br /><br /><input
-            type="text"
-            placeholder="Wpisz dystans, który został przejechany na tym polowaniu (km)"
-            id="dystans"
-          />
+        <br /><br /><input type="text" placeholder="Wpisz datę polowania (??.??.????)" id="data" />
 
-          <br /><br /><input
-            type="text"
-            placeholder="Wpisz liczbę struktur, które zostały znalezione na tym polowaniu (?, ?, ?)"
-            id="znalezione_struktury"
-          />
+        <br /><br /><input type="text"
+          placeholder="Wpisz teren, na którym odbyło się polowanie (nazwy miejscowości itd.)" id="teren" />
 
-          <br /><br />Wynik łowów<select id="wynik" title="sdds">
-            <option value=1>Kapitalny</option>
-            <option value=2>Zadowalający</option>
-            <option value=3>Słaby</option>
-            <option value=4>Zły</option>
-          </select>
+        <br /><br /><input type="text" placeholder="Wpisz myśliwych będących na polowaniu (?, ?, ...)" id="mysliwi" />
 
-          <br /><br /><button id="add_p_btn">Dodaj!</button>
+        <br /><br /><input type="text" placeholder="Wpisz budżet polowania (zł)" id="budzet" />
 
-          <br><br><br><input type="number" placeholder="Wpisz numer usuwanego polowania" id="del_p" />
-          <br /><br /><button id="del_p_btn">Usuń!</button>
-        </li>
-      </ul>
-      <input title="dc_ann" type="checkbox" id="dc_ann" checked>Wysyłaj informacje na discord</input>
-      <!-- <p id="backup_text">Pobierz kopię wszystkich struktur i wypraw:</p>
+        <br /><br /><input type="text" placeholder="Wpisz dystans, który został przejechany na tym polowaniu (km)"
+          id="dystans" />
+
+        <br /><br /><input type="text"
+          placeholder="Wpisz liczbę struktur, które zostały znalezione na tym polowaniu (?, ?, ?)"
+          id="znalezione_struktury" />
+
+        <br /><br />Wynik łowów<select id="wynik" title="sdds">
+          <option value=1>Kapitalny</option>
+          <option value=2>Zadowalający</option>
+          <option value=3>Słaby</option>
+          <option value=4>Zły</option>
+        </select>
+
+        <br /><br /><button id="add_p_btn">Dodaj!</button>
+
+        <br><br><br><input type="number" placeholder="Wpisz numer usuwanego polowania" id="del_p" />
+        <br /><br /><button id="del_p_btn">Usuń!</button>
+      </li>
+    </ul>
+    
+    <!-- <p id="backup_text">Pobierz kopię wszystkich struktur i wypraw:</p>
       <button id="backup">Pobierz</button> -->
-    </main>
+  </main>
+  <link rel="stylesheet" href="data/dist/MarkerCluster.css" />
+  <link rel="stylesheet" href="data/dist/MarkerCluster.Default.css" />
+  <script src="data/dist/leaflet.markercluster.js"></script>
 
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="client/js/admin.js"></script>
-  </body>
+  <link rel="stylesheet" href="data/dist/leaflet.awesome-markers.css">
+  <script src="data/dist/leaflet.awesome-markers.js"></script>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="client/js/admin.js"></script>
+</body>
+
 </html>

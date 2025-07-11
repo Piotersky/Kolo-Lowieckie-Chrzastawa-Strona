@@ -13,21 +13,141 @@ login_btn.addEventListener("click", () => {
   socket.emit("login", password);
 });
 
-socket.on("Authenticated", (data) => {
-  logged = true;
+socket.on("admin", (data) => {
+  if(data == true) {
+    logged = true;
 
-  var login = document.getElementById("login");
+    var login = document.getElementById("login");
 
-  login.style.visibility = "hidden";
-  login.style.width = "0px";
-  login.style.height = "0px";
+    login.style.visibility = "hidden";
+    login.style.width = "0px";
+    login.style.height = "0px";
 
-  var main = document.querySelector("main");
+    var main = document.querySelector("main");
 
-  main.style.visibility = "visible";
-  main.style.width = "100%";
-  main.style.height = "100%";
+    main.style.visibility = "visible";
+    main.style.width = "100%";
+    main.style.height = "100%";
+
+    // Fix Leaflet map rendering after showing
+    setTimeout(() => {
+      map.invalidateSize();
+    }, 100);
+  }
+  else {
+    alert("Błędne hasło!");
+    document.getElementById("password").value = "";
+  }
 });
+
+var map = L.map('map').setView([51.087654, 17.328204], 13);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors'
+  }).addTo(map);
+
+  var marker;
+
+  const customIcon = L.icon({
+    iconUrl: '/data/dist/images/pin.png',
+    iconSize: [16, 16],
+    iconAnchor: [8, 8],
+    popupAnchor: [0, -12],
+  });
+
+  const selectedIcon = L.icon({
+    iconUrl: '/data/dist/images/pin-selected.png',
+    iconSize: [16, 16],
+    iconAnchor: [0, 16],
+    popupAnchor: [0, 16],
+  });
+
+  let selectionMarker = null;
+
+  // Function to set the selection marker
+  function setSelectionMarker(latlng) {
+    document.getElementById('latitude').value = latlng.lat.toFixed(6);
+    document.getElementById('longitude').value = latlng.lng.toFixed(6);
+
+    if (selectionMarker) {
+      selectionMarker.setLatLng(latlng);
+    } else {
+      selectionMarker = L.marker(latlng, { icon: selectedIcon, zIndexOffset: 1000 }).addTo(map);
+    }
+    selectionMarker.setIcon(selectedIcon);
+  }
+
+  // Map click for selecting location
+  map.on('click', function(e) {
+    setSelectionMarker(e.latlng);
+  });
+
+  // Add markers from struktura and allow selection
+  socket.on("struktura", (data) => {
+    latitude = parseFloat(data.latitude);
+    longitude = parseFloat(data.longitude);
+
+    if (data.numer.startsWith("n")) {
+      numer = data.numer;
+    } else {
+      numer = toString(data.numer);
+    }
+
+    let hum_num = data.numer;
+    if(data.numer.includes("_")) {
+      hum_num = data.numer.split("_")[0];
+    }
+
+    let markerOptions = {  };
+
+    let markerInstance;
+    if (data.rodzaj == "1") {
+      markerInstance = L.marker([latitude, longitude], markerOptions)
+        .addTo(map)
+        .bindPopup("Ambona " + hum_num);
+    }
+    if (data.rodzaj == "2") {
+      markerInstance = L.marker([latitude, longitude], markerOptions)
+        .addTo(map)
+        .bindPopup("Zwyżka " + hum_num);
+    }
+    if (data.rodzaj == "3") {
+      markerInstance = L.marker([latitude, longitude], markerOptions)
+        .addTo(map)
+        .bindPopup("Wysiadka " + hum_num);
+    }
+
+    // Allow clicking on marker to select location
+    if (markerInstance) {
+      markerInstance.on('click', function(e) {
+        setSelectionMarker(e.latlng);
+      });
+    }
+  });
+
+  const markerClusterGroup = L.markerClusterGroup();
+
+  fetch("/data/export.geojson")
+  .then((response) => response.json())
+  .then((geojsonData) => {
+    const geoJsonLayer = L.geoJSON(geojsonData, {
+      onEachFeature: function (feature, layer) {
+        // Add click event to select location
+        layer.on('click', function(e) {
+          setSelectionMarker(e.latlng);
+        });
+      },
+      pointToLayer: function (feature, latlng) {
+        return L.marker(latlng, { icon: customIcon });
+      },
+    });
+
+    markerClusterGroup.addLayer(geoJsonLayer);
+    map.addLayer(markerClusterGroup);
+  })
+  .catch((error) => {
+    console.error("Błąd podczas ładowania pliku GeoJSON:", error);
+  });
+
 
 var add_struktura_btn = document.getElementById("add_s_btn");
 var file_input = document.getElementById("file");
@@ -67,6 +187,7 @@ file_input.addEventListener("change", function () {
       console.log(data);
 
       socket.emit("add_struktura", data);
+      alert("Dodawanie struktury...");
 
       // Reset the flag after the socket event is sent
       isAddingStruktura = false;
@@ -74,6 +195,11 @@ file_input.addEventListener("change", function () {
 
     reader.readAsDataURL(this.files[0]);
   });
+});
+
+
+socket.on("struktura_added", () => {
+  alert("Pomyślnie dodano strukturę!");
 });
 
 document.getElementById("del_s_btn").addEventListener("click", () => {
@@ -139,10 +265,10 @@ document.getElementById("del_p_btn").addEventListener("click", () => {
 //   backup_text.innerText = "Pobierz kopię wszystkich struktur i wypraw:";
 // });
 
-setTimeout(() => {
-  if (logged == false) {
-    alert(
-      "Upłynął czas na zalogowanie się.\nOdśwież stronę i spróbuj ponownie!"
-    );
-  }
-}, 30 * 1000);
+// setTimeout(() => {
+//   if (logged == false) {
+//     alert(
+//       "Upłynął czas na zalogowanie się.\nOdśwież stronę i spróbuj ponownie!"
+//     );
+//   }
+// }, 30 * 1000);

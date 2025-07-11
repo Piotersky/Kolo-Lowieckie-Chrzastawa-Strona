@@ -78,7 +78,36 @@ module.exports = (client) => {
       socket.emit("struktura", data);
     }
 
+    async function sendWithoutPhoto(element) {
+        const data = {
+          numer: element.numer,
+          rodzaj: element.rodzaj,
+          polowanie: element.polowanie,
+          longitude: element.longitude,
+          latitude: element.latitude,
+        };
+        socket.emit("struktura", data);
+      }
+
+      async function allWithoutPhoto() {
+        console.log("Sending all structures without photo");
+
+        try {
+          // Fetch all documents excluding the photo field
+          const allStruktura = await struktura.find({}, { photo: 0 }); // Exclude photo field using projection
+
+          for (const element of allStruktura) {
+            sendWithoutPhoto(element); // Send each document to the client
+          }
+
+          console.log("Finished sending all structures without photo");
+        } catch (err) {
+          console.error("Error fetching structures without photo:", err);
+        }
+      }
+
     async function all() {
+      console.log(config.batch_size);
       try {
         const sortedDocuments = await struktura.aggregate([
           {
@@ -146,11 +175,11 @@ module.exports = (client) => {
         //21.31 s 100/batch
 
 
-        const batchSize = 50; // Adjust batch size as needed
-    for (let i = 0; i < sortedDocuments.length; i += batchSize) {
-      const batch = sortedDocuments.slice(i, i + batchSize);
-      socket.emit("struktura_batch", batch); // Send a batch of documents
-    }
+
+        for (let i = 0; i < sortedDocuments.length; i += config.batch_size) {
+          const batch = sortedDocuments.slice(i, i + config.batch_size);
+          socket.emit("struktura_batch", batch); // Send a batch of documents
+        }
 
         console.log("Finished sending all structures with proper sorting");
       } catch (err) {
@@ -223,16 +252,15 @@ module.exports = (client) => {
       log(`Socket **${socket.id}** connected on /admin`);
 
       logged = false;
-
-
+      allWithoutPhoto()
 
       socket.on("login", function (data) {
         if (data == config.admin_pas) {
           logged = true;
 
-          socket.emit("Authenticated");
           log(`Logged on: **${socket.id}**`);
         }
+        socket.emit("admin", logged);
       });
 
       socket.on("add_struktura", async function (data) {
@@ -366,6 +394,7 @@ module.exports = (client) => {
             });
           }
         }
+        socket.emit("struktura_added");
 
         log(`Added struktura *${nazwa}* on: **${socket.id}**`);
       });
@@ -528,53 +557,25 @@ module.exports = (client) => {
 
       async function allPolowania() {
         try {
-          // Await the result of the distinct method
-          const distinctPolowanieValues = await polowanie.distinct("numer");
-          console.log("Sending unique polowanias");
+          // Find all polowanie documents, sorted by numer descending
+          const polowaniaList = await polowanie.find().sort({ numer: -1 });
 
-          // Iterate over the resolved array
-          for (const numer of distinctPolowanieValues) {
-            const element = await polowanie.findOne({ numer });
+          console.log("Sending polowanias sorted by numer descending");
+
+          for (const element of polowaniaList) {
             if (element) {
               send_polowanie(element);
             }
           }
         } catch (err) {
-          console.error("Error fetching unique polowanias:", err);
+          console.error("Error fetching polowanias:", err);
         }
       }
     }
     if (socket.handshake.headers["subpage"] === "mapa") {
       log(`Socket **${socket.id}** connected on /mapa`);
 
-      async function sendWithoutPhoto(element) {
-        console.log(`Sending struktura without photo: ${element.numer}`); // Debug log
-        const data = {
-          numer: element.numer,
-          rodzaj: element.rodzaj,
-          polowanie: element.polowanie,
-          longitude: element.longitude,
-          latitude: element.latitude,
-        };
-        socket.emit("struktura", data);
-      }
-
-      async function allWithoutPhoto() {
-        console.log("Sending all structures without photo");
-
-        try {
-          // Fetch all documents excluding the photo field
-          const allStruktura = await struktura.find({}, { photo: 0 }); // Exclude photo field using projection
-
-          for (const element of allStruktura) {
-            sendWithoutPhoto(element); // Send each document to the client
-          }
-
-          console.log("Finished sending all structures without photo");
-        } catch (err) {
-          console.error("Error fetching structures without photo:", err);
-        }
-      }
+      
 
       allWithoutPhoto();
     }
@@ -590,7 +591,7 @@ module.exports = (client) => {
 
     fs.writeFileSync(
       __dirname + "/data/data.json",
-      JSON.stringify({ polowania: polowaniaCount, struktury: strukturyCount }, null, 2),
+      JSON.stringify({ polowania: polowaniaCount - 1, struktury: strukturyCount }, null, 2),
       "utf8"
     );
   });
